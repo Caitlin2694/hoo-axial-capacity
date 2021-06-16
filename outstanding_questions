@@ -1,0 +1,5 @@
+1. What happens if users do not enter ytot values - is the default 9999 as in spreadsheet
+2. Where does the u2 input column come from (as it's not being imported)
+3. QT calculation uses default value of 0.6. Should this be an input?
+4. watertable variable points to RLGroundLevel input (used in u0 and sig_v0). Changing this changes the results so I cannot test if it is correct.
+5. circular reference in circular reference in qtn, n, ln calculation (I canot use this).

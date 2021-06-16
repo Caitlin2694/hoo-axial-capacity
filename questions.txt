@@ -1,0 +1,17 @@
+QUESTIONS:
+- fr% is wrong in input file
+- what is lc_cutoff
+- does qt need to be replaced with qtc?
+- what is are (1.000)?
+- Should permimiter be coming in as an input
+- where does "sand" come from?
+- are fr and fr% the same?
+
+TODO:
+- u2-kpa: not coming in but should be in input
+- gtot: do fancy input thing
+- rl_ground_level: switch to water table input
+- use macros (qt2 should be qt in the meantime)
+-  figure out what 11.176 is and CALC 0.980
+- figure out what 3.556 is 
+- calculate coe_casing properly as per B17 in Processed Data 2.
