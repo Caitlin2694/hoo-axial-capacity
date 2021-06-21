@@ -13,7 +13,7 @@
                 Contact us to learn more about our research group and methods.
               </h3>
               <h3 class="font-weight-light mt-3">
-                Telephone: +xx (xx) xxxxx-xxxx
+                Telephone: (xx) xxxxx-xxxx
               </h3>
               <h3 class="font-weight-light">
                 Email: email@email.com
@@ -97,18 +97,16 @@ export default {
     valid: true,
     name: "",
     nameRules: [
-      (v) => !!v || "O campo nome é obrigatório",
-      (v) => (v && v.length >= 6) || "O nome precisa ter mais de 6 caracteres",
+      (v) => !!v || "Name is required"
     ],
     email: "",
     emailRules: [
-      (v) => !!v || "O campo email é obrigatório",
-      (v) => /.+@.+\..+/.test(v) || "O E-mail precisa ser válido",
+      (v) => !!v || "Email is required",
+      (v) => /.+@.+\..+/.test(v) || "A valid email is required",
     ],
     textArea: "",
     textAreaRules: [
-      (v) => !!v || "O campo de texto é obrigatório",
-      (v) => (v && v.length >= 10) || "Mínimo de 10 caracteres",
+      (v) => !!v || "A message is required",
     ],
     lazy: false,
     snackbar: {

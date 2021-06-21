@@ -12,22 +12,40 @@ export default  {
     apexchart: VueApexCharts,
   },
   mounted() {
-    this.series[0].data = this.result.map(res => res[1] ? res : [res[0], null])
+        
+         this.series[0].data = this.result.map(res => res[1] ? [parseFloat(res[0]), res[1]] : [res[0], null])   
+         this.series[1].data = this.result.map(res => res[1] ? [parseFloat(res[2]), res[1]] : [res[2], null])   
   },
   watch: { 
       result() { // watch it
-          this.series[0].data = this.result.map(res => res[1] ? res : [res[0], null])   
+         this.series[0].data = this.result.map(res => res[1] ? [parseFloat(res[0]), res[1]] : [res[0], null])   
+        this.series[1].data = this.result.map(res => res[1] ? [parseFloat(res[2]), res[1]] : [res[2], null])  
     },
+  },
+  methods: {
+      getMaxTipDepth() {
+          let depths = this.result.map(res => res[1]);
+          return Math.max(...depths) + 5;
+      },
+     getMaxCapacity() {
+          let caps_1 = this.result.map(res => res[0]);
+          let caps_2 = this.result.map(res => res[2]);
+          return Math.max(...(caps_1.concat(caps_2))) + 0.5;
+      }
   },
   data() {
     return {
         series: [{
-              name: this.x_axis_name,
+              name: 'Tension',
+              data: []
+          },
+          {
+              name: 'Compression',
               data: []
           }],
           chartOptions: {
             chart: {
-              height: 350,
+              height: this.height,
               type: 'line',
               zoom: {
                 enabled: false
@@ -40,8 +58,8 @@ export default  {
               //curve: 'straight'
             },
             title: {
-                text: this.xaxis,
-                align: 'center'
+              text: this.xaxis,
+              align: 'center'
             },
             grid: {
               row: {
@@ -51,19 +69,24 @@ export default  {
             },
             yaxis: {
               decimalsInFloat: 1,
-              reverse: true,
+              min: 0,
+              max: this.getMaxTipDepth(),
+              reversed: true,
               title: {
                 text: this.yaxis,
                 style: {
-                  fontSize: 16
-                }  
+                    fontSize: 14
+                }
               },
             },
             xaxis: {
               type: 'numeric',
+              decimalsInFloat: 2,
+              min: 0,
+              max: this.getMaxCapacity(),
               position: 'top',
-                labels: {
-                rotate: 0
+              labels: {
+                  rotation: 0
               }
             }
           }

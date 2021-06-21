@@ -1,5 +1,51 @@
 <template>
-  <v-container class="mt-5">
+  <v-container class="mt-5 background">
+
+  <v-dialog
+      v-model="dialog"
+      persistent
+      max-width="290"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Enter Your Email
+        </v-card-title>
+        <v-card-text>To use this app, we ask that you enter your email address and affiliaiton. The purpose of this is so that we can see who is using our app!</v-card-text>
+           <v-card-text>
+              <v-text-field
+                label="Email"
+                type="email"
+                :rules="[rules.required]"
+                placeholder="myemail@email.com"
+                :value="email"
+              ></v-text-field> 
+              <v-text-field
+                label="Affiliation"
+                type="text"
+                placeholder="The University of Western Australia"
+                :rules="[rules.required]"
+                :value="affilliation"
+              ></v-text-field> 
+           </v-card-text>
+          <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green darken-1"
+            text
+            @click="dialog = false, navHome()"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="green darken-1"
+            text
+            @click="dialog = false, saveEmail()"
+          >
+            Continue
+          </v-btn>
+          </v-card-actions>
+      </v-card>
+    </v-dialog>
 
   <div v-if="!calculatePressed">
   <v-stepper
@@ -22,8 +68,9 @@
      <div class="pt-3">
      <p>Please up load a CSV or TXT file containing the following data in the ordr indicated</p>
           <v-file-input
-          label="Click here to select a .csv file"
+          label="Click here to select a .csv or .txt file"
           @change="selectFile"
+          accept=".csv,.txt"
           ></v-file-input>
      </div>
 
@@ -60,7 +107,7 @@
         </template>
       </v-simple-table>
 
-        <v-row class="mt-2">
+        <v-row class="mx-2 my-4">
           <v-col cols=6>
              <p>Depth of water table below ground level (m) <br> Enter zero for offshore site <br> only hyrostatic conditions are considered in this version</p>
           </v-col>
@@ -69,51 +116,19 @@
               label="Enter depth of water table"
               placeholder="0"
               outlined
-            ></v-text-field>
+              v-model="userInput.rlWaterTable"
+              type="number"
+            ></v-text-field>  <!-- todo: figure out if this is rl ground level or rl water table-->
           </v-col>
         </v-row>
 
-     <!--<div class="form-group" v-if="cpt_data_table.length > 1">-->
-        <!--<p class="mt-5">Now, use the "add weight values" button to add the unit weight (kN/m<sup>3</sup>) for each depth layer.</p>
-         <v-btn color="primary" @click="addGtot" class="mt-2">Add weight values</v-btn>
-
-    
-      
-      <div class="work-experiences">
-
-        <div class="form-row" v-for="(experience, index) in gtot_input_values" :key="index">
-        <v-row>
-            <v-col>
-             <v-select
-                :items="cpt_data_table"
-                label="start depth"
-                item-text="z"
-            ></v-select>
-            </v-col>
-           <v-col>
-            <v-select
-                :items="cpt_data_table"
-                label="end depth"
-                 item-text="z"
-           ></v-select>
-           </v-col>
-           <v-col>
-                <v-text-field
-                label="gtot value"
-                :default="value"
-              ></v-text-field>
-           </v-col>
-          </v-row>
-        </div>
-      </div>
-      </div> -->
       </v-card>
 
       </div>
       </v-card>
       <v-btn
         color="primary"
-        @click="e6 = 2"
+        @click="e6 = 2, preInputCalc()"
       >
         Check Data Entry
       </v-btn>
@@ -122,37 +137,49 @@
       </v-btn>
     </v-stepper-content>
 
-
     <v-stepper-step
       :complete="e6 > 2"
       step="2"
     >
-      Run Calculation
+      View CPT data
     </v-stepper-step>
 
-    <v-stepper-content step="3">
+    <v-stepper-content step="2">
       <v-card>
-      <p>Click "calculate" to run the calculation</p>
-      <v-btn class="ma-5" dark @click="calculate()">Calculate</v-btn> 
+      <v-row>
+        <v-col>
+          <generic-graph :result="qt_depth_chart_data" xaxis="qt (MPa)" yaxis="depth" height="500"></generic-graph>
+        </v-col>
+        <v-col>
+           <generic-graph :result="fr_percent_depth_chart_data" xaxis="F (%)" height="500"></generic-graph>
+        </v-col>
+        <v-col>
+          <generic-graph :result="lc_depth_chart_data" xaxis="lc" height="500"></generic-graph>
+        </v-col>
+      </v-row>
+       <v-btn
+        color="primary"
+        @click="e6 = 3"
+      >
+        Accept CPT Data
+      </v-btn>
+      <v-btn text
+        @click="e6 = 1"
+      >
+        Change CPT Data
+      </v-btn>
       </v-card>
     </v-stepper-content>
-  </v-stepper>
-  </div>
-
-
-
-
-
 
 
     <v-stepper-step
       :complete="e6 > 3"
       step="3"
     >
-      Input Site and Pile Information
+      Enter Pile Information
     </v-stepper-step>
 
-    <v-stepper-content step="2">
+    <v-stepper-content step="3">
       <v-card
         class="mb-12"
       >
@@ -160,81 +187,72 @@
       <v-text-field
             label="Site Name"
             placeholder="Los Coyotes"
-            :value=userInput.siteName
+            v-model="userInput.siteName"
           ></v-text-field>
-          <v-text-field
-            label="Pile Number"
-            placeholder="1"
-            :value=userInput.pileNumber
-          ></v-text-field>
-          <v-text-field
-            label="Pile Material"
-            placeholder="Steel"
-            :value=userInput.pileMaterial
-          ></v-text-field>
-          <v-text-field
-            label="Interface Friction Angle"
-            placeholder="26"
-            type="number"
-            :value=userInput.interfaceFrictionAngle
-          ></v-text-field>
-          <v-text-field
-            label="Pile Shape"
-            placeholder="Circular"
-            :value=userInput.pileShape
-          ></v-text-field>
-          <v-text-field
-            label="Pile End Condition"
-            placeholder="Open"
-            :value=userInput.pileEndCondition
-          ></v-text-field>
-          <v-text-field
-            label="FFR"
-            type="number"
-            placeholder="0.98"
-            :value=userInput.ffr
-          ></v-text-field>
-          <v-text-field
-            label="Nominal Size: Do,n (m)"
-            type="number"
-            placeholder="0.3556"
-            :value=userInput.nominalSizeDoN
-          ></v-text-field>
-         <v-text-field
-            label="Nominal Size: t (mm)"
-            type="number"
-            placeholder="11.176"
-            :value=userInput.nominalSizeT
-          ></v-text-field>
-          <v-text-field
-            label="Nominal Size: Di (mm)"
+       <v-row class="mb-3">
+       <v-col>
+       <p>Pile Shape</p>
+       <v-btn-toggle
+          v-model="userInput.pileShape"
+          mandatory
+        >
+          <v-btn>
+            Circular <v-icon>mdi-circle-outline</v-icon>
+          </v-btn>
+          <v-btn>
+            Square <v-icon>mdi-crop-square</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+       </v-col>
+       <v-col>
+        <p>Pile End Condition</p>
+         <v-btn-toggle
+          v-model="userInput.pileEndCondition"
+          mandatory
+        >
+          <v-btn>
+            Open <v-icon>mdi-window-open</v-icon>
+          </v-btn>
+          <v-btn>
+            Closed <v-icon>mdi-window-closed</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+        </v-col>
+        </v-row>
+          <v-text-field v-if="this.userInput.pileEndCondition == 0 && this.userInput.pileShape == 0"
+            label="Pile Wall Thickness (mm)"
+            :rules="[rules.required]"
             type="number"
             placeholder="0.333248"
-            :value=userInput.nominalSizeDiMM
+            v-model="userInput.nominalSizeDiMM"
           ></v-text-field>
           <v-text-field
-            label="RL Ground Level (m AHD)"
+            label="Pile Diameter or side width (m)"
+            type="number"
+            :rules="[rules.required, rules.counter]"
+            placeholder="0.3556"
+            v-model="userInput.nominalSizeDoN"
+          ></v-text-field>
+          <v-text-field
+            label="Tip depth of cased borehole (friction is ignored from ground level to over this depth)"
             type="number"
             placeholder="0"
-            :value=userInput.rlGroundLevel
-          ></v-text-field>
-            <v-text-field
-            label="RL Water Table (m AHD)"
-            type="number"
-            placeholder="-5"
-            :value=userInput.rlWaterTable
-          ></v-text-field>
-          <v-text-field
-            label="Tipdepth"
-            type="number"
-            placeholder="1.9"
-            :value=userInput.tipdepth
+            :rules="[rules.required]"
+            v-model="userInput.tipdepth"
           ></v-text-field> 
+          <v-btn class="my-2" @click="addTipDepth()">Add More Pile Tip depths for analysis</v-btn>
+          <div class="form-row" v-for="(t, index) in tipdepth_values" :key="index">
+            <v-text-field
+            type="number"
+            label="tip depth of cased borehole (m)"
+            v-model="t.value"
+          ></v-text-field>
+      </div>
           </div>
       </v-card>
       <v-btn
         color="primary"
-        @click="e6 = 3"
+        @click="e6 = 4"
       >
         Continue
       </v-btn>
@@ -244,23 +262,23 @@
     </v-stepper-content>
     
     <v-stepper-step
-      :complete="e6 > 4"
+      :complete="e6 > 3"
       step="4"
     >
-      View CPT Data
+      Calculate
     </v-stepper-step>
 
-    <v-stepper-content step="3">
+    <v-stepper-content step="4">
       <v-card>
-      <generic-graph :result="lc_depth_chart_data"></generic-graph>
-      <v-btn class="ma-5" dark @click="calculate()">Accept CPT data</v-btn> 
-      <v-btn class="ma-5" dark @click="calculate()">Change CPT data</v-btn> 
+
+      <v-btn class="ma-5" dark @click="calculate()">Calculate</v-btn> 
       </v-card>
     </v-stepper-content>
-
+  </v-stepper>
+  </div>
 <div v-if="calculatePressed">
-      <h1 class="mb-5">Output</h1>
-       <download-excel :data="res_dict" class="v-btn mb-5" dark>
+
+       <!--<download-excel :data="res_dict" class="v-btn mb-5" dark>
           CLICK HERE TO DOWNLOAD DATA
         </download-excel>
        <output-chart :result="chart_res"></output-chart>
@@ -274,10 +292,68 @@
         <v-col>
         <iz-1-depth-graph :result="iz1_depth_chart_data"></iz-1-depth-graph>
        </v-col>
+       </v-row>-->
+
+      <v-card>
+       <h1 class="pa-5">Output</h1>
+       <v-row class="ma-2">
+          <v-col cols=7>
+          <div>
+            <results-graph  class="ma-5" :result="tipdepth_chart_data" xaxis="Axial capacity (MN)" yaxis="Pile tip depth (m)" height="300"></results-graph>
+          </div>
+          </v-col>
+           <v-col cols=5>
+             <v-simple-table fixed-header class="mt-5" height="300px">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">
+                Pile tip depth (m)
+              </th>
+              <th class="text-left">
+                Tension Capacity (MN)
+              </th>
+              <th class="text-left">
+                Compression Capacity (MN)
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="item in tipdepth_res_dict"
+              :key="item.tipdepth"
+            >
+              <td>{{ item.tipdepth }}</td>
+              <td>{{ item.tension_capacity }}</td>
+              <td>{{ item.compression_capacity}}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+          </v-col>
        </v-row>
 
+      <div class="ma-5">  
+       <p>Thankyou for using our axial capacity calculator app! Click "back to input" to try different input data. Otherwise, click "go home" to go back to the home page. </p>
+       <v-btn class="ma-2 mb-5"
+        color="primary"
+        @click="navInput()"
+      >
+        Back to Input
+      </v-btn>
 
-        <v-select
+      <v-btn class="ma-2 mb-5"
+        color="primary"
+        @click="navHome()"
+      >
+        Go Home
+      </v-btn>
+      </div>
+       
+       </v-card>
+
+
+        <!--<v-select
           :items="param_dict"
            v-model="paramsIndex"
           label="Select a depth to see calculated parameters"
@@ -292,7 +368,7 @@
           item-text="depth"
           item-value="index"
         ></v-select>
-        <p>Calculated parameters for depth: {{resIndex ? res_dict[resIndex] : 'Not chosen'}}</p>
+        <p>Calculated parameters for depth: {{resIndex ? res_dict[resIndex] : 'Not chosen'}}</p>-->
        </div>
   </v-container>
 </template>
@@ -300,39 +376,50 @@
 <script>
 
   // todo: ask barry about this: Note, Eduardo/Caitlin, we need to allow for case where the qt data are widely spaced (ie depth increments are large) and hence the program needs to interpolate a minimum number of values – probably best done in this module before calculation
-  import OutputChart from './OutputChart.vue'
-  import AdopDepthGraph from './graphs/AdopDepthGraph.vue'
-  //import QT_F_Chart from './QT_F_Chart.vue'
-  //import QT_F_Chart_2 from './QT_F_Chart_2.vue'
-  import JsonExcel from "vue-json-excel";
-  import LcDepthGraph from './graphs/LcDepthGraph.vue';
-import Iz1DepthGraph from './graphs/Iz1DepthGraph.vue';
+  //import OutputChart from './OutputChart.vue'
+  //import AdopDepthGraph from './graphs/AdopDepthGraph.vue'
+  //import JsonExcel from "vue-json-excel";
+  //import LcDepthGraph from './graphs/LcDepthGraph.vue';
+//import Iz1DepthGraph from './graphs/Iz1DepthGraph.vue';
 import GenericGraph from './graphs/GenericGraph.vue';
+import ResultsGraph from './graphs/ResultsGraph.vue';
   export default {
   components: {
-    OutputChart,
-    //'qt-f-chart': QT_F_Chart,
-    //'qt-f-chart-2': QT_F_Chart_2,
-    'download-excel': JsonExcel,
-    AdopDepthGraph,
-    LcDepthGraph,
-    Iz1DepthGraph,
+    //OutputChart,
+    //'download-excel': JsonExcel,
+    //AdopDepthGraph,
+    //LcDepthGraph,
+    //Iz1DepthGraph,
     GenericGraph,
+    ResultsGraph,
   },
   data() {
     return {
+    rules: {
+        required: value => !!value || 'Required.',
+        counter: value => value < 10 || 'Please enter dimensions in metres',
+    },
+    dialog: false,
     e6: 1,
     checkbox: true,
+    tipdepth_values: [], //todo: run multiple tests
     cpt_data_table: [{z: '0.01', 'fs':'4.186', 'qc':'-1.34', 'gtot':'19.65'}],
     paramsIndex: null,
+    res_dict_iterated: [],
+    tipdepth_chart_data: [],
     param_dict: [],
     res_dict: [], 
+    tipdepth_res_dict: [],
     chart_res: [],
+    cpt_dict: [],
     qtf_chart_res: [],
     qtf_chart_res_2: [],
     adop_depth_chart_data: [],
     lc_depth_chart_data: [],
     iz1_depth_chart_data: [],
+    fr_percent_depth_chart_data: [],
+    qt_percent_depth_chart_data: [],
+    output_chart_data: [],
     final_result: 0,
     resIndex: null,
     calculatePressed: false,
@@ -369,19 +456,15 @@ import GenericGraph from './graphs/GenericGraph.vue';
     }],
     userInput: {
       siteName: "Los Coyotes",
-      pileNumber: 1,
-      pileMaterial: "Steel",
-      interfaceFrictionAngle: 26,
-      pileShape: "Circular",
-      pileEndCondition: "Open",
-      ffr: 0.98,
+      pileShape: 0,
+      pileEndCondition: 0,
       nominalSizeDoN: 0.3556,
       nominalSizeT: 11.176,
       nominalSizeDiMM: 0.333248,
       pilePerimeter: 1.11715032856,
       rlGroundLevel: 0,
       rlWaterTable: 0,
-      tipdepth: 14.9
+      tipdepth: 5
     },
     cpt_data: ['hello', 'world']
     }
@@ -390,6 +473,18 @@ import GenericGraph from './graphs/GenericGraph.vue';
     this.param_dict = JSON.parse(localStorage?.param_dict);
     this.res_dict = JSON.parse(localStorage.res_dict);
     this.setResultData();
+
+    // if email not set
+    if (!localStorage.getItem('email')) {
+      this.dialog = true;
+    }
+
+  },
+  mounted() {
+    // todo: clear email from local storage on window close
+    //window.onbeforeunload = function () {
+    //  localStorage.removeItem('email')
+    //}
   },
   methods: {
     selectFile() {
@@ -402,7 +497,6 @@ import GenericGraph from './graphs/GenericGraph.vue';
                     _this.cpt_data = results.data;
                     let temp_table_data = []
                     for (let i = 0; i< _this.cpt_data.length; i++) {
-                      //alert(_this.cpt_data[i])
                         temp_table_data.push({
                           'z': _this.cpt_data[i][0],
                           'qc': _this.cpt_data[i][1],
@@ -417,11 +511,24 @@ import GenericGraph from './graphs/GenericGraph.vue';
 
     },
     calculate() {
-      this.processInputParameters();
+      // push original tipdepth value
+      this.tipdepth_values.push({value: this.userInput.tipdepth});
+      // sort from low to high
+      this.tipdepth_values.sort(this.getTipdpthValue)
 
+      // perform all calcs for each tipdepth
+      for (let i=0; i<this.tipdepth_values.length; i++) {
+        let res =  this.processInputParameters(parseInt(this.tipdepth_values[i].value)); //todo: not sure why we must parse int here
+        this.res_dict_iterated.push(res) // creates 2D array of res.
+      }
+
+      this.setTipDepthChartData();
       
     },
-    processInputParameters() {
+    getTipdpthValue(item, nextitem) {
+        return item.value - nextitem.value;
+    },
+    processInputParameters(tip) {
       var depth, h, qc, qt, gtot, u0_kpa, sig_v0, sig_v0_prime, fs, fr_percent, lc, n, qtn, bq, kc,iz1, qtc, qp;
       depth = []
       h = [] 
@@ -442,11 +549,15 @@ import GenericGraph from './graphs/GenericGraph.vue';
       iz1 = [];
       qtc = [];
       qp = [];
+
+      let tension_capacity = null;
+      let compression_capacity = null; 
+
       const parsed_cpt_data = JSON.parse(JSON.stringify(this.cpt_data))
       for (const row of parsed_cpt_data) {
        let depth_value = parseFloat(row[0]); // get first column of input
        depth.push(depth_value);
-       h.push(this.userInput?.tipdepth - depth_value);
+       h.push(tip - depth_value);
 
        let qc_value = parseFloat(row[1]); // get second column of input
        qc.push(qc_value);
@@ -542,7 +653,7 @@ import GenericGraph from './graphs/GenericGraph.vue';
         // todo: replace qt_2 with qp (calculated with one of 3 macros)
 
         let ar_value = 1;
-        if (this.userInput?.pileEndConsition != "Closed") {
+        if (this.userInput?.pileEndConsition != 1) { //closed
           ar_value = 1-0.980*(Math.pow(don_value-2*11.176/1000, 2))/(Math.pow(don_value, 2)); //TODO:figure out what 11.176 is and CALC 0.980
         }
         let area_value = Math.PI*don_value*don_value*0.25; 
@@ -550,7 +661,7 @@ import GenericGraph from './graphs/GenericGraph.vue';
         qb_sand.push(qb_sand_value)
 
         let qb_clay_value = 0;
-        if (this.userInput?.pileEndCondition == "Closed") {
+        if (this.userInput?.pileEndCondition == 1) { //closed
           qb_clay_value = (0.8*qt[i]*1000)*area_value;
         } else {
           qb_clay_value = (0.4*qt[i]*1000)*area_value;
@@ -560,7 +671,7 @@ import GenericGraph from './graphs/GenericGraph.vue';
 
      // shaft capacity calculation
      let d_star = 0;
-     if (this.userInput?.pileEndCondition == "Closed") {
+     if (this.userInput?.pileEndCondition == 1) { //closed
        d_star = don_value
      } else {
        d_star = Math.sqrt(Math.pow(don_value, 2)- Math.pow(0.333248, 2))
@@ -635,10 +746,16 @@ import GenericGraph from './graphs/GenericGraph.vue';
      qt_res.push(qs[i]+qb[i])
     }
      
-    // calcuate final result
-    let lookup_index = depth.indexOf(this.userInput?.tipdepth)
+    // calcuate final results
+
+    let lookup_index = depth.indexOf(tip)
     let lookup_result = qs[lookup_index];
-    this.final_result = (lookup_result/1500).toFixed(3) //todo: don't use 1500, final numbers are qs, qb and qt.
+    compression_capacity = (lookup_result/1500).toFixed(3) //todo: don't use 1500, final numbers are qs, qb and qt.
+    lookup_index = depth.indexOf(tip)
+    lookup_result = qt_res[lookup_index];
+    tension_capacity = (lookup_result/1500).toFixed(3) 
+
+    // todo: check why compression and tenson capacities are the same
 
      //create dictionaries
     var param_dict_temp = [];
@@ -677,7 +794,7 @@ import GenericGraph from './graphs/GenericGraph.vue';
         lc: lc[i],
         qs: qs[i],
         qb: qb[i],
-        qt_res: qt_res[i]
+        qt_res: qt_res[i],
       })
 
     }
@@ -685,14 +802,121 @@ import GenericGraph from './graphs/GenericGraph.vue';
     this.res_dict = res_dict_temp;
     localStorage.param_dict = JSON.stringify(param_dict_temp);
     localStorage.res_dict = JSON.stringify(res_dict_temp);
+    this.tipdepth_res_dict.push({'tipdepth': tip, 'tension_capacity': tension_capacity, 'compression_capacity': compression_capacity})
 
-    this.setResultData()
-    this.setAdopDepthChartData()
-    this.setIcDepthChartData()
-    this.setIz1DepthChartData()
+    //this.setResultData()
+    //this.setAdopDepthChartData()
+    //this.setIcDepthChartData()
+    //this.setIz1DepthChartData()
 
     this.calculatePressed = true;
 
+        return res_dict_temp;
+
+    },
+    preInputCalc() {
+      var depth, h, qc, qtn, n, qt, gtot, u0_kpa, sig_v0, sig_v0_prime, fs, fr_percent, lc;
+      depth = []
+      h = [] 
+      qc = [];
+      qt = [];
+      gtot = []; // todo: should do fancy input thing
+      u0_kpa = [];
+      sig_v0 = [];
+      sig_v0_prime = [];
+      fs = [];
+      fr_percent = [];
+      n = [];
+      lc = [];
+      n = [];
+      qtn = [];
+      const parsed_cpt_data = JSON.parse(JSON.stringify(this.cpt_data))
+      for (const row of parsed_cpt_data) {
+       
+       let depth_value = parseFloat(row[0]); // get first column of input
+       depth.push(depth_value);
+       h.push(this.userInput.tipdepth - depth_value); //todo: check if this is ok.
+
+       let qc_value = parseFloat(row[1]); // get second column of input
+       qc.push(qc_value);
+
+       let fs_value = parseFloat(row[2])
+       fs.push(fs_value);
+
+       // advanced: add U2
+
+       let gtot_value = parseFloat(row[3]) // todo: todo, populate with gtot input
+       gtot.push(gtot_value);
+      }
+      
+      for (let i=0; i<depth.length; i++) {
+        // advanced correct qt with u2
+        qt.push(qc[i]) 
+        let u0_value;
+        if (depth[i]<this.userInput?.rlWaterTable) { 
+          u0_value = 0;
+        } else {
+          u0_value = (depth[i]-this.userInput?.rlWaterTable)*9.81 
+        }
+        u0_kpa.push(u0_value)
+
+        let sig_v0_value;
+        if (this.userInput?.rlWaterTable < 0) {
+          sig_v0_value = depth[i]*gtot[i]+(Math.abs(this.userInput?.rlWaterTable)*9.81); 
+        } else {
+          sig_v0_value = depth[i]*gtot[i]
+        }
+        sig_v0.push(sig_v0_value)
+
+        let sig_v0_prime_value = sig_v0_value - u0_value;
+        sig_v0_prime.push(sig_v0_prime_value)
+
+        let fr_percent_value = fs[i]/(qc[i]*1000-sig_v0_value)*100
+        fr_percent.push(fr_percent_value);
+
+        let flag = 0;
+        let n_estimate = 0.01;
+        let n_value = 0;
+        let lc_value = 0;
+        for (let j=1; j <= 10000; j++) {
+          if (flag == 0) {
+            let qtn_value = ((1000*qt[i]-sig_v0_value)/100)*Math.pow((100/sig_v0_prime_value),n_estimate); //todo: check if qc or qt
+            lc_value = Math.pow((Math.pow((3.47-Math.log10(qtn_value)), 2) + Math.pow((Math.log10(fr_percent_value)+1.22), 2)), 0.5)
+            n_value = 0.381*lc_value+0.05*(sig_v0_prime_value/100)-0.15;
+            if (n_value > 1) {n_value == 1.00}
+              if (Math.abs(n_estimate - n_value) < 0.001) { 
+                qtn.push(qtn_value);
+                lc.push(lc_value);
+                n.push(n_value)
+                flag = 1;
+              } else {
+                n_estimate = n_estimate + 0.001
+              }
+          } else {
+            break; // todo: what to do if it never converges?
+          }
+        }
+      }
+
+      let cpt_dict_temp = []
+      for (let i=0; i<depth.length; i++) {
+        cpt_dict_temp.push({
+          index: i,
+          depth: depth[i],
+          h: h[i],
+          fr_percent: fr_percent[i],
+          qt: qt[i],
+          gtot: gtot[i],
+          u0_kpa: u0_kpa[i],
+          sig_v0: sig_v0[i],
+          sig_v0_prime: sig_v0_prime[i],
+          lc: lc[i],
+          qtn: qtn[i],
+          n: n[i]
+        })
+      }
+      this.cpt_dict = cpt_dict_temp;
+      this.createCPTCharts();
     },
     setResultData() {
     let y_values = this.res_dict.map(({depth}) => depth);
@@ -736,22 +960,32 @@ import GenericGraph from './graphs/GenericGraph.vue';
     let chart_data = [];
     for (let i=0; i<x_values.length; i++) {
       var valueToPush = new Array();
-      //if (!isFinite(x_values[i])){
-      //  x_values[i] = 0; //todo: check this hack.
-      //}
       valueToPush[0] = x_values[i];
       valueToPush[1] = y_values[i];
       chart_data.push(valueToPush);
     }
     this.lc_depth_chart_data = chart_data;
   },
+  setTipDepthChartData() {
+    let y_values = this.tipdepth_res_dict.map(({tipdepth}) => tipdepth);
+    let x_values_compression = this.tipdepth_res_dict.map(({compression_capacity}) => compression_capacity);
+    let x_values_tension = this.tipdepth_res_dict.map(({tension_capacity}) => tension_capacity);
+    let chart_data = [];
+    for (let i=0; i<y_values.length; i++) {
+      var valueToPush = new Array();
+      valueToPush[0] = x_values_tension[i];
+      valueToPush[2] = x_values_compression[i];
+      valueToPush[1] = y_values[i];
+      chart_data.push(valueToPush);
+    }
+    this.tipdepth_chart_data = chart_data;
+
+  },
   downloadXLSXFile() {
 
   },
-  addGtot() {
-      this.gtot_input_values.push({
-        startPoint: '',
-        endPoint: '',
+  addTipDepth() {
+      this.tipdepth_values.push({
         value: ''
       })
   },
@@ -759,24 +993,64 @@ import GenericGraph from './graphs/GenericGraph.vue';
    return Math.log(number) / Math.log(base);
   },
   createCPTCharts() {
-    let y_values = this.res_dict.map(({depth}) => depth);
-    let x_values = this.res_dict.map(({lc}) => lc);
+
+    // qt graph
+    let y_values = this.cpt_dict.map(({depth}) => depth);
+    let x_values = this.cpt_dict.map(({qt}) => qt);
     let chart_data = [];
     for (let i=0; i<x_values.length; i++) {
       var valueToPush = new Array();
-      //if (!isFinite(x_values[i])){
-      //  x_values[i] = 0; //todo: check this hack.
-      //}
+      valueToPush[0] = x_values[i];
+      valueToPush[1] = y_values[i];
+      chart_data.push(valueToPush);
+    }
+    this.qt_depth_chart_data = chart_data;
+
+    // lc graph
+    y_values = this.cpt_dict.map(({depth}) => depth);
+    x_values = this.cpt_dict.map(({lc}) => lc);
+     chart_data = [];
+    for (let i=0; i<x_values.length; i++) {
+      valueToPush = new Array();
       valueToPush[0] = x_values[i];
       valueToPush[1] = y_values[i];
       chart_data.push(valueToPush);
     }
     this.lc_depth_chart_data = chart_data;
 
+  // fr percent graph
+    y_values = this.cpt_dict.map(({depth}) => depth);
+    x_values = this.cpt_dict.map(({fr_percent}) => fr_percent);
+    chart_data = [];
+    for (let i=0; i<x_values.length; i++) {
+      valueToPush = new Array();
+      valueToPush[0] = x_values[i];
+      valueToPush[1] = y_values[i];
+      chart_data.push(valueToPush);
+    }
+    this.fr_percent_depth_chart_data = chart_data;
+    },
+    formatResults() {
+
+    },
+    navInput() {
+       this.$router.go()
+
+    },
+    navHome() {
+      this.$router.push({path:'/'});
+    },
+    saveEmail() {
+      // todo: send email and affiliaion to server
+      localStorage.setItem("email", this.email);
+
+    }
   }
-},
-}
+  }
 </script>
 
 <style scoped>
+.background {
+  background-color: #f5f7f5;
+}
 </style>

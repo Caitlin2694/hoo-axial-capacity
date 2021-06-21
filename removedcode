@@ -1,0 +1,35 @@
+
+     <!--<div class="form-group" v-if="cpt_data_table.length > 1">-->
+        <!--<p class="mt-5">Now, use the "add weight values" button to add the unit weight (kN/m<sup>3</sup>) for each depth layer.</p>
+         <v-btn color="primary" @click="addGtot" class="mt-2">Add weight values</v-btn>
+
+    
+      
+      <div class="work-experiences">
+
+        <div class="form-row" v-for="(experience, index) in gtot_input_values" :key="index">
+        <v-row>
+            <v-col>
+             <v-select
+                :items="cpt_data_table"
+                label="start depth"
+                item-text="z"
+            ></v-select>
+            </v-col>
+           <v-col>
+            <v-select
+                :items="cpt_data_table"
+                label="end depth"
+                 item-text="z"
+           ></v-select>
+           </v-col>
+           <v-col>
+                <v-text-field
+                label="gtot value"
+                :default="value"
+              ></v-text-field>
+           </v-col>
+          </v-row>
+        </div>
+      </div>
+      </div> -->
