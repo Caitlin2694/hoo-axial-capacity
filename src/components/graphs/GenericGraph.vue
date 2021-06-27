@@ -22,7 +22,7 @@ export default  {
   data() {
     return {
         series: [{
-              name: this.x_axis_name,
+              name: this.xaxis,
               data: []
           }],
           chartOptions: {
@@ -51,7 +51,7 @@ export default  {
             },
             yaxis: {
               decimalsInFloat: 1,
-              reverse: true,
+              reversed: true,
               title: {
                 text: this.yaxis,
                 style: {

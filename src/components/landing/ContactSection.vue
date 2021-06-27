@@ -1,6 +1,6 @@
 <template>
   <section class="pb-8" id="contact">
-    <v-container fluid>
+    <v-container fluid class="mt-7">
       <v-row align="center" justify="center" class="mt-8">
         <v-col cols="10">
           <v-row justify="center">

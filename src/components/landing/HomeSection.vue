@@ -90,7 +90,7 @@
                 >
                   <h1 class="font-weight-regular">Collaborators</h1>
                   <h4 class="font-weight-regular subtitle-1">
-                    The Unified methods were developed as part of a joint Industry project (JIP) managed by the Norwegian Geotechnical Institute in collaboration with The University of Western Australia. The JIP was supported by <strong>Equinor, Lundin Oil, Ørsted, ONGC, BP, TOTAL, ExxonMobil, EnBW, EDF, Aramco, SSER and HDEC."</strong>
+                    The Unified methods were developed as part of a joint Industry project (JIP) managed by the Norwegian Geotechnical Institute in collaboration with The University of Western Australia. The JIP was supported by <strong>Equinor, Lundin Oil, Ørsted, ONGC, BP, TOTAL, ExxonMobil, EnBW, EDF, Aramco, SSER and HDEC.</strong>
                   </h4>
                 </v-card>
               </v-hover>

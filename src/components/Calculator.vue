@@ -66,7 +66,7 @@
       >
      <div>
      <div class="pt-3">
-     <p>Please up load a CSV or TXT file containing the following data in the ordr indicated</p>
+     <p>Please upload a CSV or TXT file containing the following data in the order indicated</p>
           <v-file-input
           label="Click here to select a .csv or .txt file"
           @change="selectFile"
@@ -223,15 +223,15 @@
             label="Pile Wall Thickness (mm)"
             :rules="[rules.required]"
             type="number"
-            placeholder="0.333248"
-            v-model="userInput.nominalSizeDiMM"
+            placeholder="11.176"
+            v-model="userInput.nominalSizeT"
           ></v-text-field>
           <v-text-field
             label="Pile Diameter or side width (m)"
             type="number"
             :rules="[rules.required, rules.counter]"
-            placeholder="0.3556"
-            v-model="userInput.nominalSizeDoN"
+            placeholder="0.333248"
+            v-model="userInput.nominalSizeDiMM"
           ></v-text-field>
           <v-text-field
             label="Tip depth of cased borehole (friction is ignored from ground level to over this depth)"
@@ -529,13 +529,12 @@ import ResultsGraph from './graphs/ResultsGraph.vue';
         return item.value - nextitem.value;
     },
     processInputParameters(tip) {
-      var depth, h, qc, qt, gtot, u0_kpa, sig_v0, sig_v0_prime, fs, fr_percent, lc, n, qtn, bq, kc,iz1, qtc, qp;
+      var depth, h, qc, qt, gtot, u0_kpa, sig_v0, sig_v0_prime, fs, fr_percent, lc, n, qtn, bq, kc,iz1, qtc;
       depth = []
       h = [] 
       qc = [];
-      //u2_kpa = [];// todo: check other notebook to see if u2 should be imported by the user
       qt = [];
-      gtot = []; // todo: should do fancy input thing
+      gtot = [];
       u0_kpa = [];
       sig_v0 = [];
       sig_v0_prime = [];
@@ -548,8 +547,6 @@ import ResultsGraph from './graphs/ResultsGraph.vue';
       kc = [];
       iz1 = [];
       qtc = [];
-      qp = [];
-
       let tension_capacity = null;
       let compression_capacity = null; 
 
@@ -562,12 +559,12 @@ import ResultsGraph from './graphs/ResultsGraph.vue';
        let qc_value = parseFloat(row[1]); // get second column of input
        qc.push(qc_value);
 
-       let fs_value = parseFloat(row[2])
+       let fs_value = parseFloat(row[2]) // get third column of input
        fs.push(fs_value);
 
        // advanced: add U2
 
-       let gtot_value = parseFloat(row[3]) // todo: todo, populate with gtot input
+       let gtot_value = parseFloat(row[3]) // get fourth column of input
        gtot.push(gtot_value);
       }
       
@@ -643,15 +640,12 @@ import ResultsGraph from './graphs/ResultsGraph.vue';
       let qb_sand = [];
       let qb_clay = [];
       let don_value = this.userInput?.nominalSizeDoN;
+
+      // calcualte qt_2 (qp in spreadsheet)
+      qt_2 = this.qpCalculationMacro1(depth, qt, this.userInput?.nominalSizeDiMM); //todo: switch between 3 macros.
+
       for (let i=0; i<depth.length; i++) {
-        let qt_2_value = 0
-        qt_2.push(0) 
-        qp.push(0)
-
-        // qp calculation from macro (simple method).
-
-        // todo: replace qt_2 with qp (calculated with one of 3 macros)
-
+        let qt_2_value = qt_2[i];
         let ar_value = 1;
         if (this.userInput?.pileEndConsition != 1) { //closed
           ar_value = 1-0.980*(Math.pow(don_value-2*11.176/1000, 2))/(Math.pow(don_value, 2)); //TODO:figure out what 11.176 is and CALC 0.980
@@ -1044,9 +1038,46 @@ import ResultsGraph from './graphs/ResultsGraph.vue';
       // todo: send email and affiliaion to server
       localStorage.setItem("email", this.email);
 
+    },
+    qpCalculationMacro1(depthArray, qtArray, diameter) { //todo: check where this diameter comes from
+        
+        let toReturn = [];
+
+        
+        for (let i=0; i < depthArray.length; i++) { //take one to get delta z, remember to add on at the end
+            let depth = depthArray[i];
+            let deltaz = 0
+            if (i == depthArray.length - 1) {
+                deltaz = 0 //tdo: figure out what to do at end of loop
+            }
+            deltaz = depthArray[i+1] + depthArray[i]
+            let avgcells = 1.5*diameter/deltaz
+            let qtavg = 0
+
+            if (depth > (8*diameter)) {
+
+              let qtsum = 0;
+              let n = 0
+              let j = 0 // todo: should be i - avgcells
+
+              while (j <= (i + avgcells)) { 
+                let qt = qtArray[j];
+                if (qt > 0) {
+                  qtsum = qt + qtsum
+                  n = n + 1
+                }
+                qtavg = qtsum / n;
+                j = j + 1;
+              }
+            } else {
+              qtavg = null; //todo: check if null is more appropraite
+            }
+            toReturn.push(qtavg);
+        }
+        return toReturn
     }
   }
-  }
+}
 </script>
 
 <style scoped>
