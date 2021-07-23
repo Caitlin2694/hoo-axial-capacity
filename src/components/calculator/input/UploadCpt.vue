@@ -1,0 +1,129 @@
+<template>
+    <v-card
+        class="mb-12"
+      >
+     <div>
+     <div class="pt-3">
+     <p>Please upload a CSV or TXT file containing the CPT data in the order indicated. Note the units required.</p>
+     <p class="text-body-2">The first unit weight entry will be used throughout if not other unit weights are entered.</p>
+          <v-file-input
+          label="Click here to select a .csv or .txt file"
+          @change="selectFile"
+          accept=".csv,.txt"
+          ></v-file-input>
+     </div>
+
+    <v-card>
+      <v-simple-table dense fixed-header height="250px">
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">
+                Depth (m)
+              </th>
+              <th class="text-left">
+                Cone resistance q<sub>c</sub> (MPa)
+              </th>
+              <th class="text-left">
+                Cone sleeve friction, f<sub>s</sub> (kPa)
+              </th>
+              <th class="text-left">
+                Unit weight (kN/m<sup>3</sup>)
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="item in cpt_data_table"
+              :key="item.z"
+            >
+              <td>{{ item.z }}</td>
+              <td>{{ item.qc }}</td>
+              <td>{{ item.fs }}</td>
+              <td>{{ item.gtot }}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+
+        <v-row class="mx-2 my-4">
+          <v-col cols=6>
+             <p>Depth of water table below ground level (m) <br> Enter zero for offshore site <br> Only hyrostatic conditions are considered in this version</p>
+          </v-col>
+          <v-col>
+            <v-text-field
+              label="Enter depth of water table"
+              placeholder="0"
+              outlined
+              v-model="water_table"
+              type="number"
+              :rules="[rules.required, limit(water_table)]"
+            ></v-text-field>  <!-- todo: figure out if this is rl ground level or rl water table-->
+          </v-col>
+        </v-row>
+
+      </v-card>
+      </div>
+      </v-card>
+</template>
+
+<script>
+export default {
+    watch: {
+        cpt_data: function (val) {
+            this.$emit('cptDataTableChange', val)
+        },
+        water_table: function (val) {
+            this.$emit('waterTableChange', val)
+        }
+    },
+    data() {
+        return {
+            rules: {
+              required: value => !!value || 'Required.'
+            },
+            cpt_data_table: [{z: '0.05', 'fs':'4', 'qc':'0.452', 'gtot':'19.65'}, {z: '0.01', 'fs':'10', 'qc':'0.963', 'gtot':'19.65'}, {z: '0.15', 'fs':'12', 'qc':'1.621', 'gtot':'19.65'}],
+            cpt_data: [],
+            water_table: 0,
+            max_depth: 0.15
+        }
+    },
+    computed: {
+
+    },
+    methods: {
+      limit(value) {
+        if (parseFloat(value) > parseFloat(this.max_depth)) {
+          return 'Depth of water table cannot be higher than depth from CPT data.'
+        } else {
+          return true;
+        }
+      },
+      maxDepth() {
+        this.max_depth = this.cpt_data_table[this.cpt_data_table.length - 1].z 
+      },
+        selectFile() {
+         /* return first object in FileList */
+            var file = event.target.files[0];
+            var _this = this; // save it in a variable for usage inside function
+            this.$papa.parse(file, {
+                header: false,
+                complete: function (results) {
+                    _this.cpt_data = results.data;
+                    let temp_table_data = []
+                    for (let i = 0; i< _this.cpt_data.length; i++) {
+                        temp_table_data.push({
+                          'z': _this.cpt_data[i][0],
+                          'qc': _this.cpt_data[i][1],
+                          'fs': _this.cpt_data[i][2],
+                          'gtot': _this.cpt_data[i][3]
+                        })
+                    }
+                    _this.cpt_data_table = temp_table_data;
+                    _this.maxDepth();
+                }
+            });
+        },
+    }
+}
+</script>

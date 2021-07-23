@@ -6,7 +6,8 @@
           <v-row align="center" justify="center">
             <v-col cols="12" md="6" xl="8">
               <h1 class="display-2 font-weight-bold mb-4">Driven piles axial capacity calculator</h1>
-              <h1 class="font-weight-light">
+                <v-img class="logo-img" width="70%" src="@/assets/img/uwalogo.png"></v-img>
+              <h1 class="font-weight-light mt-5">
                 This program uses CPT data to calculate the  axial capacity of
                 driven piles using the 'Unified methods' included in the 2022
                 edition of ISO-19901-4.
@@ -16,11 +17,11 @@
                 outlined
                 large
                 dark
-                @click="$vuetify.goTo('#features')"
                 class="mt-5"
+                href="/#/calculator"
               >
-                Learn More
-                <v-icon class="ml-2">mdi-arrow-down</v-icon>
+                Continue to Calculator
+                <v-icon class="ml-2">mdi-arrow-right</v-icon>
               </v-btn>
               <!--<div class="video d-flex align-center py-4">
                 <a @click.stop="dialog = true" class="playBut">
@@ -77,24 +78,7 @@
       <v-row align="center" justify="center">
         <v-col cols="10">
           <v-row align="center" justify="space-around">
-            <v-col
-              cols="12"
-              class="text-center"
-            >
-              <v-hover v-slot:default="{ hover }">
-                <v-card
-                  class="card"
-                  shaped
-                  :elevation="hover ? 10 : 4"
-                  :class="{ up: hover }"
-                >
-                  <h1 class="font-weight-regular">Collaborators</h1>
-                  <h4 class="font-weight-regular subtitle-1">
-                    The Unified methods were developed as part of a joint Industry project (JIP) managed by the Norwegian Geotechnical Institute in collaboration with The University of Western Australia. The JIP was supported by <strong>Equinor, Lundin Oil, Ørsted, ONGC, BP, TOTAL, ExxonMobil, EnBW, EDF, Aramco, SSER and HDEC.</strong>
-                  </h4>
-                </v-card>
-              </v-hover>
-            </v-col>
+
             <v-col
               cols="12"
             >
@@ -116,6 +100,24 @@
                     <v-img src="@/assets/img/img.png" height="200" contain></v-img>
                   </v-col>
                   </v-row>
+                </v-card>
+              </v-hover>
+            </v-col>
+
+            <v-col
+              cols="12"
+              class="text-center"
+            >
+              <v-hover v-slot:default="{ hover }">
+                <v-card
+                  class="card"
+                  shaped
+                  :elevation="hover ? 10 : 4"
+                  :class="{ up: hover }"
+                >
+                  <h4 class="font-weight-regular subtitle-1 mt-8">
+                    The Unified CPT method was developed as part of a joint Industry project (JIP) managed by the Norwegian Geotechnical Institute in collaboration with The University of Western Australia. The JIP was supported by <strong>Equinor, Lundin Oil, Ørsted, ONGC, BP, TOTAL, ExxonMobil, EnBW, EDF, Aramco, SSER and HDEC.</strong>
+                  </h4>
                 </v-card>
               </v-hover>
             </v-col>

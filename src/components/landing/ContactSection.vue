@@ -4,23 +4,20 @@
       <v-row align="center" justify="center" class="mt-8">
         <v-col cols="10">
           <v-row justify="center">
-            <v-col cols="12" sm="5">
+            <v-col cols="12" sm="12" align="center">
               <h1 class="font-weight-light display-1">Contact Us</h1>
               <h3 class="font-weight-light mt-3">
-                We would love to hear from you!
+                We would love to hear your feedback.
               </h3>
               <h3 class="font-weight-light mt-3">
                 Contact us to learn more about our research group and methods.
               </h3>
               <h3 class="font-weight-light mt-3">
-                Telephone: (xx) xxxxx-xxxx
-              </h3>
-              <h3 class="font-weight-light">
-                Email: email@email.com
+                <strong>Email:</strong> barry.lehane@uwa.edu.au
               </h3>
             </v-col>
             <v-col cols="12" sm="7">
-              <v-form ref="form" v-model="valid" :lazy-validation="lazy">
+              <!--<v-form ref="form" v-model="valid" :lazy-validation="lazy">
                 <v-text-field
                     v-model="name"
                     :rules="nameRules"
@@ -53,7 +50,7 @@
                 >
                    Send Message
                 </v-btn>
-              </v-form>
+              </v-form>-->
             </v-col>
           </v-row>
         </v-col>

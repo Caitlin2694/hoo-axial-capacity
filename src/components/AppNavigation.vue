@@ -1,11 +1,11 @@
 <template>
-  <v-app-bar app color="primary">
+  <v-app-bar app color="primary" height="80px">
         <v-toolbar-title class="white--text">
-        <v-img width="150" src="../assets/img/uwalogo.png"></v-img>
+        <v-img width="200" src="../assets/img/uwalogo.png"></v-img>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn @click="goToHomePage()" class="ma-2">Go To Home</v-btn>
-        <v-btn @click="goToCalculator()" class="ma-2">Go To Calculator</v-btn>
+        <!--<v-btn @click="goToHomePage()" class="ma-2">Go To Home</v-btn>
+        <v-btn @click="goToCalculator()" class="ma-2">Go To Calculator</v-btn>-->
   </v-app-bar>
 </template>
 
