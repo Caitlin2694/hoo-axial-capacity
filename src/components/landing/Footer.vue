@@ -3,7 +3,7 @@
     <v-card flat tile class="secondary white--text text-center">
       <v-divider></v-divider>
       <v-card-text class="white--text">
-        <strong>Developed by Hoo Solutions</strong>
+        <strong>Developed by <a href="https://www.hoosolutions.com.au/" target="_blank">Hoo Solutions</a></strong>
       </v-card-text>
       <v-card-text class="white--text">
         {{ new Date().getFullYear() }} — <strong>Calango WEB</strong>

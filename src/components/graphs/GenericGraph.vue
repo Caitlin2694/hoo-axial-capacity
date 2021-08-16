@@ -9,16 +9,20 @@
 <script>
 import VueApexCharts from 'vue-apexcharts'
 export default  {
-  props: ['result', 'xaxis', 'yaxis', 'height', 'minx', 'maxx', 'isQt', 'isIz'] ,
+  props: ['result', 'xaxis', 'yaxis', 'height', 'minx', 'maxx', 'isQt', 'isIz', 'tickAmount'] ,
   components: {
     apexchart: VueApexCharts,
   },
   mounted() {
     this.series[0].data = this.result.map(res => res[1] ? res : [res[0], null])
-
+    if (this.tickAmount) {
+          this.chartOptions.xaxis.tickAmount = parseInt(this.tickAmount)
+          this.chartOptions.xaxis.decimalsInFloat = 0
+    }
     if (this.isQt || this.isIz) {
       this.chartOptions.title.style.color = '#ffffff'
     }
+
   },
   watch: { 
     result() { // watch it
@@ -39,6 +43,7 @@ export default  {
               zoom: {
                 enabled: false
               },
+            
             },
             tooltip: {
               enabled: false,
@@ -47,6 +52,7 @@ export default  {
               enabled: false
             },
             stroke: {
+              width: 1,
               //curve: 'straight'
             },
             title: {
@@ -61,6 +67,16 @@ export default  {
                 colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
                 opacity: 0.5
               },
+                  xaxis: {
+                    lines: {
+                        show: true
+                }
+                },   
+                yaxis: {
+                    lines: {
+                        show: true
+                    }
+                }, 
             },
             yaxis: {
               decimalsInFloat: 0,
@@ -73,12 +89,18 @@ export default  {
               },
             },
             xaxis: {
+              decimalsInFloat: 1,
               type: 'numeric',
+              tickAmount: this.tickAmount,
+              //tickPlacement: 'on',
               min: this.minx ? parseInt(this.minx) : null,
               max: this.maxx ? parseInt(this.maxx) : null, 
               position: 'top',
                 labels: {
                 rotate: 0
+              },
+              axisTicks: {
+          show: true,
               }
             }
           }

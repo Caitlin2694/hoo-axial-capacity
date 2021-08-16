@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main class="pt-0">
-      <home />
+      <about />
       <contact />
     </v-main>
     <v-scale-transition>
@@ -34,15 +34,15 @@
 <script>
 //import navigation from "./landing/Navigation";
 import foote from "./landing/Footer";
-import home from "./landing/HomeSection";
+import about from "./landing/AboutSection";
 import contact from "./landing/ContactSection";
 
 export default {
-  name: "LandingPage",
+  name: "AboutPage",
 
   components: {
     foote,
-    home,
+    about,
     contact,
   },
 

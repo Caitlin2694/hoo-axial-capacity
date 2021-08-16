@@ -15,6 +15,16 @@ import CalculatorInput from './calculator/CalculatorInput.vue';
     EmailSignup,
     CalculatorInput,
   },
+  created() {
+    document.addEventListener('beforeunload', this.handler)
+  },
+  methods: {
+    handler: function handler() {
+        localStorage.removeItem('cpt');
+        localStorage.removeItem('userInput')
+
+    }
+  }
 }
 </script>
 

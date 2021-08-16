@@ -33,6 +33,7 @@ export default {
             sig_v0_prime.push(this.getSigV0Prime(sig_v0[i], u0_kpa[i]))
             fr_percent.push(this.getFrPercent(fs[i], qc[i], sig_v0[i]));
             let iterative_values = this.getIterativeValues(qt[i], sig_v0[i], sig_v0_prime[i], fr_percent[i])
+            
             qtn.push(iterative_values.qtn);
             lc.push(iterative_values.lc);
             n.push(iterative_values.n)
@@ -89,6 +90,8 @@ export default {
         qc = vals.qc;
         gtot = vals.gtot;
         fs = vals.fs;
+
+        pilePerimeter = this.getPilePerimeter(pileShape, nominalSizeDoN)
         
         for (let i=0; i<depth.length; i++) {
             qt.push(this.getQt(qc[i]));
@@ -136,7 +139,7 @@ export default {
             let ar_value = this.getAr(pileEndCondition, nominalSizeDoN);
             let area_value = this.getArea(nominalSizeDoN);
             let dstar_value = this.getDstar(pileEndCondition, nominalSizeDoN);
-            qb1_sand.push(this.getQb1Sand(area_value, qp_sand[i]) );
+            qb1_sand.push(this.getQb1Sand(ar_value, qp_sand[i]) );
             qb1_clay.push(this.getQb1Clay(qp_clay[i], dstar_value, nominalSizeDoN))
             qb1_adop.push(this.getQb1Adop(lc[i], qb1_sand[i], qb1_clay[i]))
             qb_sand.push(this.getQbSand(qp[i], ar_value, area_value));
@@ -154,7 +157,7 @@ export default {
             } else { 
               if (lc[i]<2.5) { // advanced: allow users to modify this
                 delta_ord.push(this.getDeltaOrd(qtc[i], sig_v0_prime[i], nominalSizeDoN)) 
-                orc.push(this.getOrc(qtc[i], area_value, nominalSizeDoN, h[i])) 
+                orc.push(this.getOrc(qtc[i], ar_value, nominalSizeDoN, h[i])) 
                 tf_sand.push(this.getTfSand(coe_casing[i], delta_ord[i], orc[i]));
               } else {
                 delta_ord.push(0);
@@ -297,7 +300,63 @@ export default {
     getFrPercent(fs_value, qc_value, sig_v0_value) {
         return fs_value/(qc_value*1000-sig_v0_value)*100
     },
+    /*getIterativeValuesNew(qt_value, sig_v0_value, sig_v0_prime_value, fr_percent_value) {
+        let ntrial = 0
+        let n = 0
+        let qnet = 
+        let pa =
+        let sevo = 
+        //let Q = (qnet / pa) * (pa / sevo)
+        if (Rf = 0) {
+            Ic = 0 
+        } else {
+            Ic = ((3.47 - Application.WorksheetFunction.Log(Q)) ^ 2 + (1.22 + Application.WorksheetFunction.Log(Rf)) ^ 2) ^ 0.5
+        }
+        ntrial = 0.381 * Ic + 0.05 * (sevo / pa) - 0.15
+        err = Abs(ntrial - n)
+        while (err > 0.001) {
+            Qtn = (qnet / pa) * (pa / sevo) ^ ntrial
+            if (Rf = 0) {
+                Ic = 0 
+            } else {
+                Ic = ((3.47 - Application.WorksheetFunction.Log(Qtn)) ^ 2 + (1.22 + Application.WorksheetFunction.Log(Rf)) ^ 2) ^ 0.5
+            }
+        }
+        n = Math.min(1, 0.381 * Ic + 0.05 * (sevo / pa) - 0.15)
+        err = Math.abs(ntrial - n)
+        ntrial = n
+    },*/
     getIterativeValues(qt_value, sig_v0_value, sig_v0_prime_value, fr_percent_value) {
+        let ntrial = 0
+        let n = 0
+        let lc = 0
+        let qtn = 0;
+        if (fr_percent_value == 0) {
+            lc = 0;
+        } else {
+            lc = this.getLc(qt_value, fr_percent_value) //todo: check this
+        }
+        ntrial = this.getN(lc, sig_v0_prime_value)
+        let err = Math.abs(ntrial - n)
+        while (err > 0.001) {
+            qtn = this.getQtn(qt_value, sig_v0_value, sig_v0_prime_value, ntrial)
+            if (fr_percent_value == 0) {
+                lc = 0;
+            } else {
+                lc = this.getLc(qtn, fr_percent_value)
+            }
+            n =  Math.min(1, this.getN(lc, fr_percent_value))
+            err = Math.abs(ntrial - n)
+            ntrial = n
+        }
+        return {
+            qtn: qtn,
+            lc: lc,
+            n: n
+        }
+
+    },
+    /*getIterativeValues(qt_value, sig_v0_value, sig_v0_prime_value, fr_percent_value) {
         let flag = 0;
         let n_estimate = 0.01;
         let n_value = 0;
@@ -319,10 +378,12 @@ export default {
                 n_estimate = n_estimate + 0.001
                 }
             } else {
+                console.log('iterative values could not converge')
                 break; // todo: what to do if it never converges?
-                    }
             }
-        }, 
+            }
+            console.log('iterative values could not converge')
+        }, */
     getQtn(qt_value, sig_v0_value, sig_v0_prime_value, n_estimate) {
      return ((1000*qt_value-sig_v0_value)/100)*Math.pow((100/sig_v0_prime_value),n_estimate); //todo: check if qc or qt
     },
@@ -391,8 +452,6 @@ export default {
             }
             qpArray.push(qpc);
         }
-        //console.log('clay')
-        //console.log(qpArray)
         return qpArray;
     },
     getQpSandArray(depthArray, qtArray, nominalSizeDoN) {
@@ -559,6 +618,14 @@ export default {
     },
     getQtRes(qs_value, qb_value) {
         return qs_value+qb_value
+    },
+    getPilePerimeter(pileShape, nominalSizeDoN) {
+        if (pileShape == 0) { //zero is circular {
+            return Math.PI*nominalSizeDoN;
+        } else {
+            return nominalSizeDoN*4
+        }
+
     },
     getQtCompression(qs_compression, qb_final) {
         return qs_compression + qb_final;

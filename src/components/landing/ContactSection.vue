@@ -15,6 +15,13 @@
               <h3 class="font-weight-light mt-3">
                 <strong>Email:</strong> barry.lehane@uwa.edu.au
               </h3>
+              <h3 class="font-weight-light mt-3">
+                If you experience technical difficulties when using this application, please contact Hoo Solutions.
+              </h3>
+              <h3 class="font-weight-light mt-3">
+                <strong>Email:</strong> caitlin@hoosolutions.com.au
+              </h3>
+
             </v-col>
             <v-col cols="12" sm="7">
               <!--<v-form ref="form" v-model="valid" :lazy-validation="lazy">

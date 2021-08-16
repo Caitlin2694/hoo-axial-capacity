@@ -13,7 +13,7 @@
 
     <v-stepper-content step="1">
 
-      <upload-cpt v-on:cptDataTableChange="onCptDataTableChange" v-on:waterTableChange="onWaterTableChange"></upload-cpt>
+      <upload-cpt :cpt_data_table_input="cpt_data" v-on:cptDataTableChange="onCptDataTableChange" v-on:waterTableChange="onWaterTableChange"></upload-cpt>
       
       <v-btn
         color="primary"
@@ -65,8 +65,8 @@
       >
       <div class="pa-5">
       <v-text-field
-            label="Site Name (not required)"
-            placeholder="Los Coyotes"
+            label="File Name for Download (not required)"
+            placeholder="UWA Trial"
             v-model="userInput.siteName"
           ></v-text-field>
        <v-row class="mb-3">
@@ -111,28 +111,21 @@
             type="number"
             :rules="[rules.required, rules.counter]"
             placeholder="0.333248"
-            v-model="userInput.nominalSizeDiMM"
+            v-model="userInput.nominalSizeDoN"
           ></v-text-field>
           <v-text-field
-            label="Tip depth of cased borehole (friction is ignored from ground level to over this depth)"
+            label="Tip depth of cased borehole (friction is ignored from ground level to this depth)"
             type="number"
             placeholder="0"
             :rules="[rules.required]"
             v-model="userInput.borehole"
           ></v-text-field> 
           <v-text-field
-            label="Add pile depths (m) for analysis (separated by commas)"
+            label="Pile tip depths (m) for analysis (separated by commas)"
             type="text"
-            :rules="[rules.required]"
+            :rules="[tipdepth_limit(userInput.tipdepth_analysis_values), tipdepth_commas(userInput.tipdepth_analysis_values), rules.required, ]"
             v-model="userInput.tipdepth_analysis_values"
           ></v-text-field> 
-          <div class="form-row" v-for="(t, index) in tipdepth_values" :key="index">
-            <v-text-field
-            type="number"
-            label="tip depth of cased borehole (m)"
-            v-model="t.value"
-          ></v-text-field>
-      </div>
           </div>
       </v-card>
       <v-btn
@@ -175,6 +168,16 @@ export default {
     UploadCpt,
     ViewCpt
   },
+  beforeMount() {
+    let savedCPT = JSON.parse(localStorage.getItem('cpt'));
+    let savedUserInput = JSON.parse(localStorage.getItem('userInput'));
+    if (savedCPT) {
+      this.cpt_data = savedCPT;
+    }
+    if (savedUserInput) {
+      this.userInput = savedUserInput;
+    }
+  },
   data() {
     return {    
       rules: {
@@ -184,7 +187,7 @@ export default {
       e6: 1,
       checkbox: true,
       userInput: {
-        siteName: "Los Coyotes",
+        siteName: "UWA Trial",
         pileShape: 0,
         pileEndCondition: 0,
         nominalSizeDoN: 0.3556,
@@ -201,10 +204,48 @@ export default {
       fr_percent_depth_chart_data: [],
       qt_depth_chart_data: [],
       iz1_depth_chart_data: [],
-      tipdepth_res_dict: []
+      tipdepth_res_dict: [],
+      max_depth: 0,
     }
   },
+  computed: {
+
+  },
   methods: {
+      tipdepth_limit(value) {
+
+        this.maxDepth();
+        let list = value.split(',');
+        let flag = true;
+        list.forEach(depth => {
+          depth = depth.trim();
+          if (parseFloat(depth) > parseFloat(this.max_depth)) {
+            flag = 'Tip depth cannot be higher than depth from CPT data'
+          } else { 
+            flag = true;
+          }
+        })
+        return flag;
+      },
+
+     tipdepth_commas(value) {
+
+        if (!value.includes(',')) {
+          let list = value.split(' ')
+          if (list.length > 1 && list[1] != '') {
+            return 'Tip depths must be separated by commas'
+          } else {
+            return true;
+          }
+        }
+        return true;
+      },
+
+      maxDepth() {
+        if (this.cpt_data[this.cpt_data.length - 1]) {
+        this.max_depth = this.cpt_data[this.cpt_data.length - 1][0]
+        }
+      },
       onCptDataTableChange(val) {
         this.cpt_data = val;
       },
@@ -264,6 +305,12 @@ export default {
       },
       calculate() {
         // sort from low to high
+
+        // save cpt and user input to localstorage
+        localStorage.setItem('cpt', JSON.stringify(this.cpt_data));
+        localStorage.setItem('userInput', JSON.stringify(this.userInput))
+
+
         let tipdepths = this.userInput.tipdepth_analysis_values.split(',').map(t => {
           t = t.trim();
           return parseFloat(t);
@@ -277,6 +324,8 @@ export default {
         }
         this.setTipDepthChartData();
         this.nav('CalculatorOutput')
+
+
     },
   getTipdpthValue(item, nextitem) {
       return item.value - nextitem.value;
@@ -296,7 +345,7 @@ export default {
     this.tipdepth_chart_data = chart_data;
   },
   nav(name) {
-    this.$router.push({name: name, params: {data_dict: this.tipdepth_res_dict ,chart_data: this.tipdepth_chart_data}});
+    this.$router.push({name: name, params: {data_dict: this.tipdepth_res_dict, chart_data: this.tipdepth_chart_data, site_name: this.userInput.siteName, user_input: this.userInput}});
   }
   }
   }

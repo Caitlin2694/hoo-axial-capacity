@@ -6,6 +6,7 @@
      <div class="pt-3">
      <p>Please upload a CSV or TXT file containing the CPT data in the order indicated. Note the units required.</p>
      <p class="text-body-2">The first unit weight entry will be used throughout if not other unit weights are entered.</p>
+     <p class="text-body-2">The depth incement from this CSV file controls the accuracy of the calculations.</p>
           <v-file-input
           label="Click here to select a .csv or .txt file"
           @change="selectFile"
@@ -22,7 +23,7 @@
                 Depth (m)
               </th>
               <th class="text-left">
-                Cone resistance q<sub>c</sub> (MPa)
+                Cone resistance q<sub>t</sub> (MPa)
               </th>
               <th class="text-left">
                 Cone sleeve friction, f<sub>s</sub> (kPa)
@@ -38,10 +39,16 @@
               :key="item.z"
             >
               <td>{{ item.z }}</td>
-              <td>{{ item.qc }}</td>
-              <td>{{ item.fs }}</td>
+              <td>{{ item.qc ? Math.round(item.qc * 1000) / 1000  : 0 }}</td> <!--Rounded to 3 d.p.-->
+              <td>{{ item.fs ? Math.round(item.fs * 10) / 10  : 0  }}</td>  <!--Rounded to 1 d.p.-->
               <td>{{ item.gtot }}</td>
             </tr>
+            <v-alert
+              v-if="erroredInput"
+              color="red"
+              dismissible
+              type="error"
+            >Your input CPT data contains incomplete values. Please check your data and try again. </v-alert>
           </tbody>
         </template>
       </v-simple-table>
@@ -69,6 +76,7 @@
 
 <script>
 export default {
+    props: ['cpt_data_table_input'],
     watch: {
         cpt_data: function (val) {
             this.$emit('cptDataTableChange', val)
@@ -76,6 +84,37 @@ export default {
         water_table: function (val) {
             this.$emit('waterTableChange', val)
         }
+    },
+    beforeMount() {
+      if (this.cpt_data_table_input && this.cpt_data_table_input.length > 0) {
+                this.cpt_data = this.cpt_data_table_input;
+              let temp_table_data = []
+                    for (let i = 0; i< this.cpt_data.length; i++) {
+                      if (this.cpt_data[i][0] == "" &&  this.cpt_data[i][1] == null &&  this.cpt_data[i][2] == null &&  this.cpt_data[i][3] == null) { //if empty row, skip
+                         this.cpt_data.splice(i, 1) //ignore row
+                      } else if (this.cpt_data[i][0] == "" || this.cpt_data[i][0] == null) {
+                        this.erroredInput = true;
+                        temp_table_data = [];
+                        break;
+                      }   
+                      
+                      else { 
+                        if (this.cpt_data[i][3] == "" || this.cpt_data[i][0] == null) {
+                          this.cpt_data[i][3] = this.cpt_data[i-1][3] //take last gtot value
+                        }
+                        temp_table_data.push({
+                          'z': this.cpt_data[i][0],
+                          'qc': this.cpt_data[i][1],
+                          'fs': this.cpt_data[i][2],
+                          'gtot': this.cpt_data[i][3]
+                        })
+                      }
+                    }
+                    this.cpt_data_table = temp_table_data;
+                    this.maxDepth();
+
+
+      }
     },
     data() {
         return {
@@ -85,7 +124,8 @@ export default {
             cpt_data_table: [{z: '0.05', 'fs':'4', 'qc':'0.452', 'gtot':'19.65'}, {z: '0.01', 'fs':'10', 'qc':'0.963', 'gtot':'19.65'}, {z: '0.15', 'fs':'12', 'qc':'1.621', 'gtot':'19.65'}],
             cpt_data: [],
             water_table: 0,
-            max_depth: 0.15
+            max_depth: 0.15,
+            erroredInput: false,
         }
     },
     computed: {
@@ -103,6 +143,7 @@ export default {
         this.max_depth = this.cpt_data_table[this.cpt_data_table.length - 1].z 
       },
         selectFile() {
+          this.erroredInput = false;
          /* return first object in FileList */
             var file = event.target.files[0];
             var _this = this; // save it in a variable for usage inside function
@@ -112,12 +153,26 @@ export default {
                     _this.cpt_data = results.data;
                     let temp_table_data = []
                     for (let i = 0; i< _this.cpt_data.length; i++) {
+                      if (_this.cpt_data[i][0] == "" &&  _this.cpt_data[i][1] == null &&  _this.cpt_data[i][2] == null &&  _this.cpt_data[i][3] == null) { //if empty row, skip
+                         _this.cpt_data.splice(i, 1)
+                      } else if (_this.cpt_data[i][0] == "" || _this.cpt_data[i][0] == null ||
+                      _this.cpt_data[i][1] == "" || _this.cpt_data[i][1] == null ||
+                      _this.cpt_data[i][2] == "" || _this.cpt_data[i][2] == null) {
+                        _this.erroredInput = true;
+                        temp_table_data = [];
+                        break;
+                      }   
+                      else { 
+                        if (_this.cpt_data[i][3] == "" || _this.cpt_data[i][0] == null) {
+                          _this.cpt_data[i][3] = _this.cpt_data[i-1][3] //take last gtot value
+                        }
                         temp_table_data.push({
                           'z': _this.cpt_data[i][0],
                           'qc': _this.cpt_data[i][1],
                           'fs': _this.cpt_data[i][2],
                           'gtot': _this.cpt_data[i][3]
                         })
+                      }
                     }
                     _this.cpt_data_table = temp_table_data;
                     _this.maxDepth();

@@ -6,23 +6,23 @@
     >
       <v-card>
         <v-card-title class="text-h5">
-          Enter Your Email
+          Registration
         </v-card-title>
-        <v-card-text>To use this app, we ask that you enter your email address and affiliaiton. The purpose of this is so that we can see who is using our app!</v-card-text>
+        <v-card-text>Registration allows us to keep track of usage; no other details are saved.</v-card-text>
            <v-card-text>
               <v-text-field
                 label="Email"
                 type="email"
                 :rules="[rules.required]"
                 placeholder="myemail@email.com"
-                :value="email"
+                :v-model="email"
               ></v-text-field> 
               <v-text-field
                 label="Affiliation"
                 type="text"
                 placeholder="The University of Western Australia"
                 :rules="[rules.required]"
-                :value="affilliation"
+                :v-model="affilliation"
               ></v-text-field> 
            </v-card-text>
           <v-card-actions>
@@ -71,9 +71,21 @@ export default {
             this.$router.push({path:'/'});
         },
         saveEmail() {
-            // todo: send email and affiliaion to server.
-            localStorage.setItem("email", this.email);
+            //alert(this.email)
+            localStorage.setItem("email", 'email set'); //todo: change to actual email
+            this.post(); //todo: put error handling on this.
         },
+        post() {
+          // Simple POST request with a JSON body using fetch
+          /*const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: this.email, affilliation: this.affilliation})
+          };
+          fetch("http://localhost:3000/register-new", requestOptions) //todo: update for move to server
+            .then(() => console.log('registered'))
+        }*/
+        }
     }
 }
 </script>
