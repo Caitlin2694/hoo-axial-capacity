@@ -7,7 +7,7 @@
                 outlined
                 large
                 class="mt-5"
-                href="/#/calculator"
+                href="/calculator"
               >
                 Press to Continue
                 <v-icon class="ml-2">mdi-arrow-right</v-icon>
@@ -68,7 +68,7 @@
                 outlined
                 large
                 class="mt-5"
-                href="/#/calculator"
+                href="/calculator"
               >
                 Press to Continue
                 <v-icon class="ml-2">mdi-arrow-right</v-icon>

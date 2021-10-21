@@ -6,7 +6,7 @@
      <div class="pt-3">
      <p>Please upload a CSV or TXT file containing the CPT data in the order indicated. Note the units required.</p>
      <p class="text-body-2">The first unit weight entry will be used throughout if not other unit weights are entered.</p>
-     <p class="text-body-2">The depth incement from this CSV file controls the accuracy of the calculations.</p>
+     <p class="text-body-2">The depth increment from this CSV file controls the accuracy of the calculations (suggested increment &#8804; 0.1 m).</p>
           <v-file-input
           label="Click here to select a .csv or .txt file"
           @change="selectFile"

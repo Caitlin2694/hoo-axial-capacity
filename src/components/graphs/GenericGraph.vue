@@ -9,7 +9,7 @@
 <script>
 import VueApexCharts from 'vue-apexcharts'
 export default  {
-  props: ['result', 'xaxis', 'yaxis', 'height', 'minx', 'maxx', 'isQt', 'isIz', 'tickAmount'] ,
+  props: ['result', 'xaxis', 'yaxis', 'height', 'minx', 'maxx', 'isQt', 'isIz', 'isIc', 'tickAmount'] ,
   components: {
     apexchart: VueApexCharts,
   },
@@ -21,6 +21,26 @@ export default  {
     }
     if (this.isQt || this.isIz) {
       this.chartOptions.title.style.color = '#ffffff'
+    }
+
+    if (this.isIc) {
+      this.chartOptions.annotations.xaxis.push(
+      {
+            x: 2.05,
+            x2: 2.5,
+            fillColor: '#B3F7CA',
+            opacity: 0.4,
+            label: {
+              borderColor: '#B3F7CA',
+              style: {
+                fontSize: '10px',
+                color: '#fff',
+                background: '#00E396',
+              },
+              offsetY: -10,
+            }
+          }
+      )
     }
 
   },
@@ -44,6 +64,9 @@ export default  {
                 enabled: false
               },
             
+            },
+            annotations: {
+              xaxis: []
             },
             tooltip: {
               enabled: false,

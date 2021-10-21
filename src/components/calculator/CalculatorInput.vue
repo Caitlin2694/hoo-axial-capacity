@@ -99,6 +99,7 @@
         </v-btn-toggle>
         </v-col>
         </v-row>
+        <v-form v-model="isFormValid">
           <v-text-field v-if="this.userInput.pileEndCondition == 0 && this.userInput.pileShape == 0"
             label="Pile Wall Thickness (mm)"
             :rules="[rules.required]"
@@ -116,21 +117,23 @@
           <v-text-field
             label="Tip depth of cased borehole (friction is ignored from ground level to this depth)"
             type="number"
-            placeholder="0"
-            :rules="[rules.required]"
+            :rules="[rules.required_borehole]"
             v-model="userInput.borehole"
+            :value="userInput.borehole"
           ></v-text-field> 
           <v-text-field
             label="Pile tip depths (m) for analysis (separated by commas)"
             type="text"
-            :rules="[tipdepth_limit(userInput.tipdepth_analysis_values), tipdepth_commas(userInput.tipdepth_analysis_values), rules.required, ]"
+            :rules="[tipdepth_limit(userInput.tipdepth_analysis_values), tipdepth_vals_check(userInput.tipdepth_analysis_values),  tipdepth_commas(userInput.tipdepth_analysis_values), rules.required, ]"
             v-model="userInput.tipdepth_analysis_values"
           ></v-text-field> 
+          </v-form>
           </div>
       </v-card>
       <v-btn
         color="primary"
         @click="e6 = 4"
+        :disabled="!isFormValid"
       >
         Continue
       </v-btn>
@@ -177,15 +180,19 @@ export default {
     if (savedUserInput) {
       this.userInput = savedUserInput;
     }
+    
   },
   data() {
     return {    
       rules: {
-        required: value => !!value || 'Required.',
+        required_borehole:(value) => !!value || 'Required.',
+        required:(value) => !!value || 'Required.',
         counter: value => value < 10 || 'Please enter dimensions in metres',
       },
       e6: 1,
       checkbox: true,
+      userInputValid: true,
+      isFormValid: false,
       userInput: {
         siteName: "UWA Trial",
         pileShape: 0,
@@ -196,7 +203,7 @@ export default {
         pilePerimeter: 1.11715032856,
         rlGroundLevel: 0,
         rlWaterTable: 0,
-        borehole: 0,
+        borehole: 3,
         tipdepth_analysis_values: "6, 10, 15, 18, 25", //todo: rset up to run multiple tests.
     },
       cpt_data: [], 
@@ -212,6 +219,9 @@ export default {
 
   },
   methods: {
+          validate () {
+        this.$refs.form.validate()
+      },
       tipdepth_limit(value) {
 
         this.maxDepth();
@@ -221,8 +231,26 @@ export default {
           depth = depth.trim();
           if (parseFloat(depth) > parseFloat(this.max_depth)) {
             flag = 'Tip depth cannot be higher than depth from CPT data'
+            this.userInputValid = false;
           } else { 
             flag = true;
+            this.userInputValid = true;
+          }
+        })
+        return flag;
+      },
+
+      tipdepth_vals_check(value) {
+        let depthList = this.cpt_data.map(data => parseFloat(data[0]))
+        let list = value.split(',');
+        let flag = true;
+        list.forEach(depth => {
+          if (!(depthList.indexOf(parseFloat(depth)) > -1)) {
+            flag = 'All tip depths must have a corresponding value in the CPT data'
+            this.userInputValid = false;
+          } else { 
+            flag = true;
+            this.userInputValid = true;
           }
         })
         return flag;
@@ -233,8 +261,10 @@ export default {
         if (!value.includes(',')) {
           let list = value.split(' ')
           if (list.length > 1 && list[1] != '') {
+            this.userInputValid = false;
             return 'Tip depths must be separated by commas'
           } else {
+            this.userInputValid = false;
             return true;
           }
         }
@@ -304,6 +334,8 @@ export default {
         this.iz1_depth_chart_data = chart_data;
       },
       calculate() {
+
+       
         // sort from low to high
 
         // save cpt and user input to localstorage

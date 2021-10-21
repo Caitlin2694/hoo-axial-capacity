@@ -28,7 +28,7 @@
        <v-row class="ma-2">
           <v-col cols=7>
           <div>
-            <results-graph class="ma-5" :result="chart_data" xaxis="Axial capacity (MN)" yaxis="Pile tip depth (m)" height="300"></results-graph>
+            <results-graph class="ma-5" :result="chart_data" xaxis="Axial capacity (kN)" yaxis="Pile tip depth (m)" height="300"></results-graph>
           </div>
           </v-col>
            <v-col cols=5>
@@ -40,10 +40,10 @@
                 Pile tip depth (m)
               </th>
               <th class="text-left">
-                Tension Capacity (MN)
+                Tension Capacity (kN)
               </th>
               <th class="text-left">
-                Compression Capacity (MN)
+                Compression Capacity (kN)
               </th>
             </tr>
           </thead>
@@ -62,8 +62,11 @@
           </v-col>
        </v-row>
 
-      <div class="ma-5">  
+
+      <div class="ma-5"> 
        <p>Thankyou for using our axial capacity calculator app! Click "back to input" to try different input data. Otherwise, click "go home" to go back to the home page. </p>
+                    <v-row>
+       <v-col>
        <v-btn class="ma-2 mb-5"
         color="primary"
         @click="navInput()"
@@ -77,21 +80,45 @@
       >
         Go Home
       </v-btn>
+      </v-col>
+      <v-col>
+        <p class="font-weight-light mt-3">
+                Contact us to learn more about our research group and methods.
+              </p>
+              <p class="font-weight-light mt-3">
+                <strong>Email:</strong> barry.lehane@uwa.edu.au
+              <p>
+              <p class="font-weight-light mt-3">
+                If you experience technical difficulties when using this application, please contact Hoo Solutions.
+              </p>
+              <p class="font-weight-light mt-3">
+                <strong>Email:</strong> caitlin@hoosolutions.com.au
+              </p>
+      </v-col>
+      </v-row>
 
-      <!-- <download-csv
-        class="v-btn primary"
+      <v-row>
+      <download-csv
+        class=""
         :data="debugParams()"
         name="param_debug_data.csv">
-        Debug Params
+         <v-btn class="ma-2 mb-5"
+          color="primary">
+          Debug Params
+        </v-btn>
       </download-csv>
 
       <download-csv
-        class="v-btn primary"
+        class=""
         :data="debugResults()"
         name="result_debug_data.csv">
-        Debug Results
-      </download-csv>  FOR DEBUGGING -->
-      </div>
+        <v-btn class="ma-2 mb-5"
+          color="primary">
+          Debug Results
+        </v-btn>
+      </download-csv>  
+      </v-row>
+            </div> 
     </v-card>
   </v-container>
 </template>

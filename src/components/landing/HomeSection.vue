@@ -18,7 +18,7 @@
                 large
                 dark
                 class="mt-5"
-                href="/#/about"
+                href="/about"
               >
                 Press to Continue
                 <v-icon class="ml-2">mdi-arrow-right</v-icon>

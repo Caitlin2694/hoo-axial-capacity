@@ -133,21 +133,30 @@ export default {
         qp_clay = this.getQpClayArray(depth, qt, nominalSizeDoN, nominalSizeT);
         qp_sand = this.getQpSandArray(depth, qtc, nominalSizeDoN);
 
-        for (let i=0; i<depth.length; i++) {
+        let diameter = this.getDiameter(nominalSizeDoN, nominalSizeT)
+        let ifr_value = this.getIFR(diameter)
+        let are_value = this.getAr(pileEndCondition, nominalSizeDoN, ifr_value, diameter);
+        //let area_value = this.getArea(nominalSizeDoN);
+        let dstar_value = this.getDstar(pileEndCondition, nominalSizeDoN, diameter);
+        let area_value = this.getAreaB(pileShape, nominalSizeDoN);
+        for (let i = 0; i < depth.length; i++) {
             qp = this.getQpMixArray(qp_sand[i], qp_clay[i], lc[i]);
             
-            let ar_value = this.getAr(pileEndCondition, nominalSizeDoN);
-            let area_value = this.getArea(nominalSizeDoN);
-            let dstar_value = this.getDstar(pileEndCondition, nominalSizeDoN);
-            qb1_sand.push(this.getQb1Sand(ar_value, qp_sand[i]) );
+            //let ifr_value = 0.838 //todo: check if default value
+            //let diameter = this.getDiameter(nominalSizeDoN, nominalSizeT) 
+            //let are_value = this.getAr(pileEndCondition, nominalSizeDoN, ifr_value, diameter);
+            //alert(are_value)
+            //let area_value = this.getArea(nominalSizeDoN);
+            //let dstar_value = this.getDstar(pileEndCondition, nominalSizeDoN);
+            qb1_sand.push(this.getQb1Sand(are_value, qp_sand[i]) );
             qb1_clay.push(this.getQb1Clay(qp_clay[i], dstar_value, nominalSizeDoN))
             qb1_adop.push(this.getQb1Adop(lc[i], qb1_sand[i], qb1_clay[i]))
-            qb_sand.push(this.getQbSand(qp[i], ar_value, area_value));
+            qb_sand.push(this.getQbSand(qp[i], are_value, area_value));
             qb_clay.push(this.getQbClay(pileEndCondition, qt[i], area_value));
-            let area_b = this.getAreaB(pileShape, nominalSizeDoN);
-            qb_final.push(this.getQbFinal(qb1_adop[i], area_b));
+            //let area_b = this.getAreaB(pileShape, nominalSizeDoN);
+            qb_final.push(this.getQbFinal(qb1_adop[i], area_value));
             coe_casing.push(this.getCoeCasing(depth[i], tip, borehole));
-
+            // todo: figure out area vs area B.
             if (coe_casing[i] == 0) {
                 delta_ord.push(0);
                 orc.push(0);
@@ -157,7 +166,7 @@ export default {
             } else { 
               if (lc[i]<2.5) { // advanced: allow users to modify this
                 delta_ord.push(this.getDeltaOrd(qtc[i], sig_v0_prime[i], nominalSizeDoN)) 
-                orc.push(this.getOrc(qtc[i], ar_value, nominalSizeDoN, h[i])) 
+                orc.push(this.getOrc(qtc[i], are_value, nominalSizeDoN, h[i])) 
                 tf_sand.push(this.getTfSand(coe_casing[i], delta_ord[i], orc[i]));
               } else {
                 delta_ord.push(0);
@@ -167,8 +176,10 @@ export default {
             }
             tf_clay.push(this.getTfClay(qt[i], coe_casing[i], h[i], dstar_value));
             iz1.push(this.getIz1(qtn[i], fr_percent[i]));
-            tf_adop_tension.push(this.getTfAdopTension(iz1[i], tf_clay[i], tf_sand[i], lc[i]));
-            tf_adop_compression.push(this.getTfAdopCompression(iz1[i], tf_clay[i], tf_sand[i], lc[i]));
+            if (coe_casing[i] != 0) {
+                tf_adop_tension.push(this.getTfAdopTension(iz1[i], tf_clay[i], tf_sand[i], lc[i]));
+                tf_adop_compression.push(this.getTfAdopCompression(iz1[i], tf_clay[i], tf_sand[i], lc[i]));
+            }
             let previousQsTension = i > 0 ? qs_tension[i-1] : 0; // todo: check if tension or compression.
             let previousQsCompression = i > 0 ? qs_compression[i-1] : 0; // todo: check if tension or compression.
             qs_tension.push(this.getQs(i, depth, tf_adop_tension[i], pilePerimeter, previousQsTension));
@@ -201,6 +212,11 @@ export default {
         for (let i=0; i<depth.length; i++) {
         param_dict_temp.push({
             index: i,
+            ifr_value: ifr_value, //todo: check if default value
+            diameter: diameter,
+            are_value: are_value,
+            area_value: area_value,
+            dstar_value: dstar_value,
             depth: depth[i],
             h: h[i],
             fr_percent: fr_percent[i],
@@ -326,6 +342,9 @@ export default {
         err = Math.abs(ntrial - n)
         ntrial = n
     },*/
+    getDiameter(nominalSizeDoN, t_value) {
+        return nominalSizeDoN-2*t_value/1000
+    },
     getIterativeValues(qt_value, sig_v0_value, sig_v0_prime_value, fr_percent_value) {
         let ntrial = 0
         let n = 0
@@ -401,8 +420,8 @@ export default {
           return 1;
         } else if (lc_value > 2.5) { //advanced: allow users to modify this value
           return 1;
-        } else {
-          return 3.96*Math.pow(lc_value, 2)-14.78*lc_value+14.78;
+        } else { //todo: check if 3.93 or 3.96
+          return 3.93*Math.pow(lc_value, 2)-14.78*lc_value+14.78;
         }
     },
     getQtc(kc_value, qt_value) {
@@ -498,12 +517,14 @@ export default {
         //console.log(qpArray);
         return qpArray;
     },
-    getAr(pileEndCondition, nominalSizeDoN) {
+    getAr(pileEndCondition, nominalSizeDoN, ifr_value, diameter) {
         if (pileEndCondition != 1) { //closed
-            return 1-0.980*(Math.pow(nominalSizeDoN-2*11.176/1000, 2))/(Math.pow(nominalSizeDoN, 2)); //TODO:figure out what 11.176 is and CALC 0.980
+        // return 1-0.980*(Math.pow(nominalSizeDoN-2*11.176/1000, 2))/(Math.pow(nominalSizeDoN, 2)); //TODO:figure out what 11.176 is and CALC 0.980
+            return 1 - ifr_value*(Math.pow((diameter/nominalSizeDoN), 2))
         } else {
             return 1;
         }
+
     },
     getArea(nominalSizeDoN) {
         return Math.PI*nominalSizeDoN*nominalSizeDoN*0.25; 
@@ -527,17 +548,17 @@ export default {
         return qp_clay*(0.2+0.6*Math.pow(d_star/nominalSizeDoN, 2))
     },
     getQb1Adop(lc_value, qb1_sand, qb1_clay) {
-        if (lc_value > 2.5) { // if clay, allow user to modify this
+        if (lc_value > 2.5) { // if clay or zone, allow user to modify this 
             return qb1_clay
         } else {
             return qb1_sand
         }
     },
-    getDstar(pileEndCondition, nominalSizeDoN) {
+    getDstar(pileEndCondition, nominalSizeDoN, diameter) {
         if (pileEndCondition == 1) { //closed
             return nominalSizeDoN;
         } else {
-            return Math.sqrt(Math.pow(nominalSizeDoN, 2)- Math.pow(0.333248, 2));
+            return Math.sqrt(Math.pow(nominalSizeDoN, 2)- Math.pow(diameter, 2));
         }
     },
     getCoeCasing(depth, tip, borehole) {
@@ -645,6 +666,9 @@ export default {
         let qb = 0;
         qb = qb_final[lookup_index];
         return qs + qb;
+    },
+    getIFR(diameter) {
+        return Math.tanh(0.3*(Math.pow(diameter*1000/35.68, 0.5)))
     },
     log(base, number) {
         return Math.log(number) / Math.log(base);
