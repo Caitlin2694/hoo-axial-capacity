@@ -1,7 +1,7 @@
 <template>
     <div v-if="series[0].data.length > 0" id="chart">
         <p class="text-body-2 title" v-if="isQt"><strong>q<sub>t</sub> (MPa)</strong></p>
-        <p class="text-body-2 title" v-if="isIz"><strong>I<sub>z</sub></strong></p>
+        <p class="text-body-2 title2" v-if="isIz"><strong>I<sub>z</sub> (for I<sub>z</sub> &lt; 10) </strong></p>
         <apexchart type="line" :height="height" :options="chartOptions" :series="series"></apexchart>
     </div>
 </template>
@@ -137,6 +137,11 @@ export default  {
     position: absolute;
     top: 20;
     left: 45%;
+  }
+    .title2 {
+    position: absolute;
+    top: 20;
+    left: 40%;
   }
 </style>
 

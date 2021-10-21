@@ -86,7 +86,10 @@ export default  {
               max: this.getMaxCapacity(),
               position: 'top',
               labels: {
-                  rotation: 0
+                  rotation: 0,
+                  formatter: function(val) {
+                      return val.toFixed(0);
+                  }
               }
             }
           }

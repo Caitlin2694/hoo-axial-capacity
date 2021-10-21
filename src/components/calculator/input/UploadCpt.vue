@@ -4,7 +4,7 @@
       >
      <div>
      <div class="pt-3">
-     <p>Please upload a CSV or TXT file containing the CPT data in the order indicated. Note the units required.</p>
+     <p>Please upload a CSV or TXT file containing the CPT data in the order indicated below. Note the units required. The CPT profile must extend below the maximum pile depth.</p>
      <p class="text-body-2">The first unit weight entry will be used throughout if not other unit weights are entered.</p>
      <p class="text-body-2">The depth increment from this CSV file controls the accuracy of the calculations (suggested increment &#8804; 0.1 m).</p>
           <v-file-input
@@ -55,7 +55,7 @@
 
         <v-row class="mx-2 my-4">
           <v-col cols=6>
-             <p>Depth of water table below ground level (m) <br> Enter zero for offshore site <br> Only hyrostatic conditions are considered in this version</p>
+             <p>Depth of water table below ground level (m) <br> Enter zero for offshore site <br> Only hydrostatic conditions are considered in this version</p>
           </v-col>
           <v-col>
             <v-text-field

@@ -28,7 +28,7 @@
        <v-row class="ma-2">
           <v-col cols=7>
           <div>
-            <results-graph class="ma-5" :result="chart_data" xaxis="Axial capacity (kN)" yaxis="Pile tip depth (m)" height="300"></results-graph>
+            <results-graph class="ma-5" :result="chart_data" xaxis="Axial capacity (kN)" yaxis="Pile tip depth (m)" height="500"></results-graph>
           </div>
           </v-col>
            <v-col cols=5>
@@ -53,8 +53,8 @@
               :key="item.tipdepth"
             >
               <td>{{ item.tipdepth }}</td>
-              <td>{{ item.tension_capacity ? item.tension_capacity.toFixed(3) : 'N/A'}}</td>
-              <td>{{ item.compression_capacity ? item.compression_capacity.toFixed(3) : 'N/A'}}</td>
+              <td>{{ item.tension_capacity ? item.tension_capacity.toFixed(0) : 'N/A'}}</td>
+              <td>{{ item.compression_capacity ? item.compression_capacity.toFixed(0) : 'N/A'}}</td>
             </tr>
           </tbody>
         </template>
@@ -81,7 +81,7 @@
         Go Home
       </v-btn>
       </v-col>
-      <v-col>
+      <!--<v-col>
         <p class="font-weight-light mt-3">
                 Contact us to learn more about our research group and methods.
               </p>
@@ -94,11 +94,11 @@
               <p class="font-weight-light mt-3">
                 <strong>Email:</strong> caitlin@hoosolutions.com.au
               </p>
-      </v-col>
+      </v-col>-->
       </v-row>
 
       <v-row>
-      <download-csv
+      <!--<download-csv
         class=""
         :data="debugParams()"
         name="param_debug_data.csv">
@@ -116,7 +116,7 @@
           color="primary">
           Debug Results
         </v-btn>
-      </download-csv>  
+      </download-csv>  -->
       </v-row>
             </div> 
     </v-card>
