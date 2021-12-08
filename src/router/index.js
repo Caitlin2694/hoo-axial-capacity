@@ -5,6 +5,7 @@ import Calculator from '../components/Calculator.vue'
 import Landing from '../components/LandingPage.vue'
 import CalculatorOutput from '../components/calculator/CalculatorOutput.vue'
 import About from '../components/AboutPage.vue'
+import Licence from '../components/Licence.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -27,6 +28,12 @@ const routes = [
     path: '/calculator/output',
     name: 'CalculatorOutput',
     component: CalculatorOutput,
+    props: true
+  },
+  {
+    path: '/licence',
+    name: 'Licence',
+    component: Licence,
     props: true
   }
 ]

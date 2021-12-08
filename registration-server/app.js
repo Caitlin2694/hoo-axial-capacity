@@ -9,6 +9,8 @@ const logger = require('./config/winston');
 var indexRouter = require('./routes/index');
 
 var app = express();
+
+
 app.use(cors())
 
 // view engine setup
@@ -39,5 +41,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+
 
 module.exports = app;

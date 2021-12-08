@@ -25,12 +25,12 @@ export default  {
   methods: {
       getMaxTipDepth() {
           let depths = this.result.map(res => res[1]);
-          return Math.max(...depths) + 5;
+          return Math.max(...depths);
       },
      getMaxCapacity() {
           let caps_1 = this.result.map(res => res[0]);
-          let caps_2 = this.result.map(res => res[2]);
-          return Math.max(...(caps_1.concat(caps_2))) + 0.5;
+          let caps_2 = this.result.map(res => res[2]);       
+          return Math.ceil(Math.max(Math.max(...(caps_1.concat(caps_2))))/100)*100 ;
       }
   },
   data() {

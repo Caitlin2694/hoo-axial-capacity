@@ -12,17 +12,15 @@
            <v-card-text>
               <v-text-field
                 label="Email"
-                type="email"
                 :rules="[rules.required]"
                 placeholder="myemail@email.com"
-                :v-model="email"
+                v-model="email"
               ></v-text-field> 
               <v-text-field
                 label="Affiliation"
-                type="text"
                 placeholder="The University of Western Australia"
                 :rules="[rules.required]"
-                :v-model="affilliation"
+                v-model="affilliation"
               ></v-text-field> 
            </v-card-text>
           <v-card-actions>
@@ -77,14 +75,13 @@ export default {
         },
         post() {
           // Simple POST request with a JSON body using fetch
-          /*const requestOptions = {
+          const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: this.email, affilliation: this.affilliation})
           };
-          fetch("http://localhost:3000/register-new", requestOptions) //todo: update for move to server
+          fetch("https://pile-capacity-uwa.com/api/register-new", requestOptions) //todo: update for move to server
             .then(() => console.log('registered'))
-        }*/
         }
     }
 }

@@ -5,7 +5,6 @@ const { Server } = require('http');
 const logger = require('../config/winston');
 
 router.post('/register-new', function(req, res) {
-
   logger.log({
     // Message to be logged
         message: 'New registration: '+ req.body.email + ', ' + req.body.affilliation,

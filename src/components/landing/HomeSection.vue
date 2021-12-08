@@ -23,6 +23,7 @@
                 Press to Continue
                 <v-icon class="ml-2">mdi-arrow-right</v-icon>
               </v-btn>
+              <p class="text-body-2 mt-3 ml-1">This freeware is provided "AS IS", and you, its user, assume all risks when using it. Licenced under a <a href="/licence" target="_blank" class="tou">MIT license</a></p>
               <!--<div class="video d-flex align-center py-4">
                 <a @click.stop="dialog = true" class="playBut">
                   <svg
@@ -227,6 +228,8 @@ export default {
   padding: 10px;
   transition: 0.5s ease-out;
 }
+
+.tou { color: white !important }
 
 .card .v-image {
   margin-bottom: 15px;
