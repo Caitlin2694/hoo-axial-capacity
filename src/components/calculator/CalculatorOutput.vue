@@ -98,8 +98,8 @@
       </v-col>-->
       </v-row>
 
-      <v-row>
-      <!--<download-csv
+      <v-row> <!-- todo: hide before deploy -->
+      <download-csv
         class=""
         :data="debugParams()"
         name="param_debug_data.csv">
@@ -117,7 +117,7 @@
           color="primary">
           Debug Results
         </v-btn>
-      </download-csv>  -->
+      </download-csv>  
       </v-row>
             </div> 
     </v-card>

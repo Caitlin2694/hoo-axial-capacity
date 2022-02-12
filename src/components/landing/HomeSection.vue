@@ -1,5 +1,6 @@
 <template>
   <section id="hero">
+  <coming-soon-dialog :dialog="comingSoonDialogOpen" @close="closeComingSoonDialog"></coming-soon-dialog>
     <v-parallax dark src="@/assets/ocean.jpg" height="750">
       <v-row align="center" justify="center">
         <v-col cols="10">
@@ -12,17 +13,38 @@
                 driven piles using the 'Unified methods' included in the 2022
                 edition of ISO-19901-4.
               </h1>
-              <v-btn
+              <v-row>
+                <v-btn
                 rounded
                 outlined
                 large
                 dark
-                class="mt-5"
-                href="/about"
+                class="ma-5"
+                href="/about?pile=driven"
               >
-                Press to Continue
-                <v-icon class="ml-2">mdi-arrow-right</v-icon>
-              </v-btn>
+                Driven Piles
+                </v-btn>
+                <v-btn
+                rounded
+                outlined
+                large
+                dark
+                class="ma-5"
+                href="/about?pile=bored"
+              >
+                Bored / CFA Piles
+                </v-btn>
+                                <v-btn
+                rounded
+                outlined
+                large
+                dark
+                class="ma-5"
+                @click="openComingSoonPopup()"
+              >
+                Screw Piles
+                </v-btn>
+              </v-row>
               <p class="text-body-2 mt-3 ml-1">This freeware is provided "AS IS", and you, its user, assume all risks when using it. Licenced under a <a href="/licence" target="_blank" class="tou">MIT license</a></p>
               <!--<div class="video d-flex align-center py-4">
                 <a @click.stop="dialog = true" class="playBut">
@@ -91,10 +113,14 @@
 </template>
 
 <script>
+import ComingSoonDialog from './ComingSoonDialog.vue';
 export default {
+  components: {
+    ComingSoonDialog,
+  },
   data() {
     return {
-      dialog: false,
+      comingSoonDialogOpen: false,
       videoId: "i8IvvHJssWE",
       features: [
         {
@@ -137,6 +163,12 @@ export default {
     pause() {
       this.player.pauseVideo();
     },
+    openComingSoonPopup() {
+      this.comingSoonDialogOpen = true;
+    },
+    closeComingSoonDialog() {
+      this.comingSoonDialogOpen = false;
+    }
   },
 };
 </script>
