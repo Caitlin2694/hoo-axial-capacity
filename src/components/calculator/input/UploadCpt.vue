@@ -2,7 +2,7 @@
     <v-card
         class="mb-12"
       >
-     <div>
+     <div @paste="convert_paste_to_cpt">
      <div class="pt-3">
      <p>Please upload a CSV or TXT file containing the CPT data in the order indicated below. Note the units required. The CPT profile must extend below the maximum pile depth.</p>
      <p class="text-body-2">The first unit weight entry will be used throughout if not other unit weights are entered.</p>
@@ -15,7 +15,7 @@
      </div>
 
     <v-card>
-      <v-simple-table dense fixed-header height="250px">
+      <v-simple-table dense fixed-header height="250px" >
         <template v-slot:default>
           <thead>
             <tr>
@@ -151,6 +151,12 @@ export default {
                 header: false,
                 complete: function (results) {
                     _this.cpt_data = results.data;
+                    _this.complete_data_selection(_this)
+
+                }
+            });
+        },
+        complete_data_selection(_this) {
                     let temp_table_data = []
                     for (let i = 0; i< _this.cpt_data.length; i++) {
                       if (_this.cpt_data[i][0] == "" &&  _this.cpt_data[i][1] == null &&  _this.cpt_data[i][2] == null &&  _this.cpt_data[i][3] == null) { //if empty row, skip
@@ -176,9 +182,35 @@ export default {
                     }
                     _this.cpt_data_table = temp_table_data;
                     _this.maxDepth();
-                }
-            });
-        },
+         },
+          convert_paste_to_cpt() {
+            let rows = this.paste_excel();
+            this.cpt_data = rows;
+            this.complete_data_selection(this)
+          },
+          paste_excel() {
+            var clipboardData = window.clipboardData || event.clipboardData || event.originalEvent && event.originalEvent.clipboardData;
+            var pastedText = clipboardData.getData("Text") || clipboardData.getData("text/plain");
+            if (!pastedText && pastedText.length) {
+                return;
+            }
+            let rows = pastedText.replace(/"((?:[^"]*(?:\r\n|\n\r|\n|\r))+[^"]+)"/mg, function (match, p1) {
+            // This function runs for each cell with multi lined text.
+            return p1
+                // Replace any double double-quotes with a single
+                // double-quote
+                .replace(/""/g, '"')
+                // Replace all new lines with spaces.
+                .replace(/\r\n|\n\r|\n|\r/g, ' ') ;
+            })
+            // Split each line into rows
+            .replace(/\t/g, ',')
+            .split(/\r\n|\n\r|\n|\r/g)
+
+            rows = rows.map(row => row.split(','))
+
+            return rows;
+        }
     }
 }
 </script>

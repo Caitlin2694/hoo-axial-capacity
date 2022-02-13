@@ -36,7 +36,7 @@
 
     <v-stepper-content step="2">
 
-        <view-cpt :qt_depth_chart_data="qt_depth_chart_data" :fr_percent_depth_chart_data="fr_percent_depth_chart_data" :lc_depth_chart_data="lc_depth_chart_data" :iz1_depth_chart_data="iz1_depth_chart_data"></view-cpt>
+        <view-cpt :qt_depth_chart_data="qt_depth_chart_data" :fr_percent_depth_chart_data="fr_percent_depth_chart_data" :lc_depth_chart_data="lc_depth_chart_data" :iz1_depth_chart_data="iz1_depth_chart_data" :alg_type="this.pile"></view-cpt>
 
        <v-btn
         color="primary"
@@ -270,7 +270,7 @@ export default {
     this.tipdepth_chart_data = chart_data;
   },
   nav(name) {
-    this.$router.push({name: name, params: {data_dict: this.tipdepth_res_dict, chart_data: this.tipdepth_chart_data, site_name: this.userInput.siteName, user_input: this.userInput}});
+    this.$router.push({name: name, params: {data_dict: this.tipdepth_res_dict, chart_data: this.tipdepth_chart_data, site_name: this.userInput.siteName, user_input: this.userInput, alg_type: this.pile}})
   }
   }
   }

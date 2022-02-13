@@ -98,8 +98,8 @@
       </v-col>-->
       </v-row>
 
-      <v-row> <!-- todo: hide before deploy -->
-      <download-csv
+      <v-row> 
+      <!--<download-csv
         class=""
         :data="debugParams()"
         name="param_debug_data.csv">
@@ -117,7 +117,7 @@
           color="primary">
           Debug Results
         </v-btn>
-      </download-csv>  
+      </download-csv>  -->
       </v-row>
             </div> 
     </v-card>
@@ -130,7 +130,7 @@ import JsonCSV from 'vue-json-csv'
 //import JsonCSV from 'vue-json-csv'
 export default {
   components: { ResultsGraph, 'downloadCsv': JsonCSV},
-    props: ['chart_data', 'data_dict', 'site_name', 'user_input'],
+    props: ['chart_data', 'data_dict', 'site_name', 'user_input', 'alg_type'],
     methods: {
       navHome() {
         this.$router.push({path:'/'});
@@ -139,7 +139,8 @@ export default {
       },
       navInput() {
         this.$router.push({path:'/'});
-        this.$router.push({path:'/calculator'});
+        if (this.alg_type == "driven") this.$router.push({path:'/calculator?pile=driven'});
+        else this.$router.push({path:'/calculator?pile=bored'});
       },
       debugParams() {
         return JSON.parse(localStorage.getItem('param_dict'));

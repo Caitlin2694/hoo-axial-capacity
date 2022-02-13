@@ -17,7 +17,7 @@
             v-model="userInput.nominalSizeDoN"
           ></v-text-field>
           <v-text-field
-            label="Dbase"
+            label="Pile base diameter (m)"
             type="number"
             v-model="userInput.dbase"
             :value="userInput.dbase"
