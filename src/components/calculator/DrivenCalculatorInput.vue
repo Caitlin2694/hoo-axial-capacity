@@ -90,6 +90,7 @@ export default ({
         if (this.saved_input) {
             this.userInput = this.saved_input;
         }
+        this.$emit('change', {input: this.userInput, isValid: this.isFormValid});
     },
     data() {
         return {
@@ -115,14 +116,13 @@ export default ({
             }
         },
     methods: {
-        onChange() {
+      onChange() {
             this.$emit('change', {input: this.userInput, isValid: this.isFormValid});
         },
-        validate () {
+      validate() {
         this.$refs.form.validate()
       },
       tipdepth_limit(value) {
-
         this.maxDepth();
         let list = value.split(',');
         let flag = true;

@@ -76,7 +76,7 @@
 
 <script>
 export default {
-    props: ['cpt_data_table_input'],
+    props: ['cpt_data_table_input', 'savedWaterTable'],
     watch: {
         cpt_data: function (val) {
             this.$emit('cptDataTableChange', val)
@@ -86,6 +86,9 @@ export default {
         }
     },
     beforeMount() {
+      if (this.savedWaterTable) {
+        this.water_table = this.savedWaterTable
+      }
       if (this.cpt_data_table_input && this.cpt_data_table_input.length > 0) {
                 this.cpt_data = this.cpt_data_table_input;
               let temp_table_data = []

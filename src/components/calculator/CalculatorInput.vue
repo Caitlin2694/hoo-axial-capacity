@@ -13,7 +13,7 @@
 
     <v-stepper-content step="1">
 
-      <upload-cpt :cpt_data_table_input="cpt_data" v-on:cptDataTableChange="onCptDataTableChange" v-on:waterTableChange="onWaterTableChange"></upload-cpt>
+      <upload-cpt :cpt_data_table_input="cpt_data" v-on:cptDataTableChange="onCptDataTableChange" v-on:waterTableChange="onWaterTableChange" :savedWaterTable="savedWaterTable"></upload-cpt>
       
       <v-btn
         color="primary"
@@ -63,7 +63,7 @@
     <v-stepper-content step="3">
 
      <driven-calculator-input v-if="pile == 'driven'" :saved_input="savedUserInput" :cpt_data="cpt_data" @change="onInputChange"></driven-calculator-input>
-     <bored-calculator-input v-else-if="pile == 'bored'" :saved_input="savedUserInput" :cpt_data="cpt_data" @change="onInputChange"></bored-calculator-input>
+     <bored-calculator-input v-else-if="pile == 'bored'" :saved_input="savedBoredUserInput" :cpt_data="cpt_data" @change="onInputChange"></bored-calculator-input>
       
       <v-btn
         color="primary"
@@ -115,12 +115,21 @@ export default {
   beforeMount() {
     let savedCPT = JSON.parse(localStorage.getItem('cpt'));
     let savedUserInput = JSON.parse(localStorage.getItem('userInput'));
+    let savedBoredUserInput = JSON.parse(localStorage.getItem('boredUserInput'));
+    let savedWaterTable = JSON.parse(localStorage.getItem('waterTable'));
     if (savedCPT) {
       this.cpt_data = savedCPT;
     }
     if (savedUserInput) {
       this.savedUserInput = savedUserInput;
     } 
+    if (savedBoredUserInput) {
+      this.savedBoredUserInput = savedBoredUserInput;
+    }
+    if (savedWaterTable) {
+      this.savedWaterTable = savedWaterTable;
+      this.rlWaterTable = savedWaterTable;
+    }
   },
   mounted() {
     // get URL param "pile"
@@ -151,6 +160,8 @@ export default {
       tipdepth_res_dict: [],
       max_depth: 0,
       savedUserInput: null,
+      savedBoredUserInput: null,
+      savedWaterTable: null,
     }
   },
   computed: {
@@ -225,7 +236,14 @@ export default {
 
         // save cpt and user input to localstorage
         localStorage.setItem('cpt', JSON.stringify(this.cpt_data));
+        // save water table
+        localStorage.setItem('waterTable', JSON.stringify(this.rlWaterTable));
+        if (this.pile == "driven") {
         localStorage.setItem('userInput', JSON.stringify(this.userInput))
+        } else if (this.pile == "bored") {
+        localStorage.setItem('boredUserInput', JSON.stringify(this.userInput))
+        }
+
 
 
         let tipdepths = this.userInput.tipdepth_analysis_values.split(',').map(t => {

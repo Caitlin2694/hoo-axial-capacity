@@ -44,7 +44,7 @@
 
 
 export default ({
-    props: ['cpt_data'],
+    props: ['cpt_data', "saved_input"],
     // watch for changes in user input
     watch: {
       userInput: {
@@ -54,6 +54,11 @@ export default ({
         deep: true,
       },
 
+    },
+    mounted() {
+        if (this.saved_input) {
+            this.userInput = this.saved_input;
+        }
     },
     data() {
         return {
