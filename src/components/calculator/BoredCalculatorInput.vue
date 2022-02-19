@@ -32,7 +32,7 @@
           <v-text-field
             label="Pile tip depths (m) for analysis (separated by commas) - note maximum depth is required to be less than depth of CPT."
             type="text"
-            :rules="[tipdepth_limit(userInput.tipdepth_analysis_values), tipdepth_vals_check(userInput.tipdepth_analysis_values),  tipdepth_commas(userInput.tipdepth_analysis_values), rules.required, ]"
+            :rules="[tipdepth_limit(userInput.tipdepth_analysis_values), tipdepth_vals_check(userInput.tipdepth_analysis_values),  tipdepth_commas(userInput.tipdepth_analysis_values), rules.required ]"
             v-model="userInput.tipdepth_analysis_values"
           ></v-text-field> 
           </v-form>
@@ -51,7 +51,7 @@ export default ({
         handler: function () {
             this.onChange();
         },
-        deep: true
+        deep: true,
       },
 
     },
@@ -63,6 +63,7 @@ export default ({
                 counter: value => value < 10 || 'Please enter dimensions in metres',
             },
             isFormValid: false,
+            untouched: true,
             userInput: {
                 siteName: "UWA Trial",
                 nominalSizeDoN: 0.762,
@@ -74,10 +75,12 @@ export default ({
                 dbase: 0.762,
                 tipdepth_analysis_values: "6, 10, 15, 18, 25", //todo: rset up to run multiple tests.
                 },
-            }
-        },
+
+        }
+    },
     methods: {
         onChange() {
+            this.untouched = false;
             this.$emit('change', {input: this.userInput, isValid: this.isFormValid});
         },
         validate () {

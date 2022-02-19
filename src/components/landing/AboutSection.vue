@@ -2,7 +2,8 @@
   <section id="about">
     <v-container fluid>
       <v-row align="center" justify="center">
-                                  <v-btn
+      <v-col cols="12" align=center justify="center">
+       <v-btn
                 rounded
                 outlined
                 large
@@ -12,6 +13,7 @@
                 Press to Continue
                 <v-icon class="ml-2">mdi-arrow-right</v-icon>
               </v-btn>
+      </v-col>
         <v-col cols="10">
 
            <v-container fluid id="features" class="mt-2">
@@ -32,26 +34,11 @@
               </v-hover>
             </v-col>
 
-            <v-col
-              cols="12"
-              class="text-center"
-            >
-              <v-hover v-slot:default="{ hover }">
-                <v-card
-                  class="card"
-                  shaped
-                  :elevation="hover ? 10 : 4"
-                  :class="{ up: hover }"
-                >
-                  <h4 class="font-weight-regular subtitle-1 mt-8">
-                    The Unified CPT method was developed as part of a joint Industry project (JIP) managed by the <strong>Norwegian Geotechnical Institute</strong> in collaboration with <strong>The University of Western Australia</strong>. The JIP was supported by Equinor, Lundin Oil, Ørsted, ONGC, BP, TOTAL, ExxonMobil, EnBW, EDF, Aramco, SSER and HDEC.
-                  </h4>
-                </v-card>
-              </v-hover>
-            </v-col>
+            
           </v-row>
         </v-col>
-                            <v-btn
+              <v-col cols="12" align=center justify="center">
+         <v-btn
                 rounded
                 outlined
                 large
@@ -61,6 +48,7 @@
                 Press to Continue
                 <v-icon class="ml-2">mdi-arrow-right</v-icon>
               </v-btn>
+              </v-col>
       </v-row>
     </v-container>
  

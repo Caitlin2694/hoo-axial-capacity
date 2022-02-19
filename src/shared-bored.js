@@ -97,13 +97,14 @@ export default {
         //const pilePerimeter = this.getPilePerimeter(pileShape, nominalSizeDoN)
         const pilePerimeter = this.getPilePerimeterBored(nominalSizeDoN)
   
-        for (let i=0; i<depth.length; i++) {
+        for (let i = 0; i < depth.length; i++) {
             qt.push(this.getQt(qc[i]));
             u0_kpa.push(this.getU0Kpa(depth[i], rlWaterTable))
             sig_v0.push(this.getSigV0(depth[i], gtot[i], rlWaterTable))
             sig_v0_prime.push(this.getSigV0Prime(sig_v0[i], u0_kpa[i]))
             fr_percent.push(this.getFrPercent(fs[i], qc[i], sig_v0[i]));
             let iterative_values = this.getIterativeValues(qt[i], sig_v0[i], sig_v0_prime[i], fr_percent[i])
+
             qtn.push(iterative_values.qtn);
             lc.push(iterative_values.lc);
             n.push(iterative_values.n);
@@ -111,7 +112,6 @@ export default {
             //kc.push(this.getKc(lc[i]));
             //qtc.push(this.getQtc(kc[i], qt[i]));
         }
-
         // base capacity calculation
         //let qp = [] // todo: check if this is qb?
         //let qb_sand = [];
@@ -137,7 +137,7 @@ export default {
 
         //qp_clay = this.getQpClayArray(depth, qt, nominalSizeDoN, nominalSizeT);
         //qp_sand = this.getQpSandArray(depth, qtc, nominalSizeDoN);
-
+        //alert('here1')
         //let diameter = this.getDiameter(nominalSizeDoN, nominalSizeT)
         //let ifr_value = this.getIFR(diameter)
         //let are_value = this.getAr(pileEndCondition, nominalSizeDoN, ifr_value, diameter);
@@ -186,6 +186,7 @@ export default {
                 //tf_clay.push(this.getTfClay(qt[i], coe_casing[i], h[i], dstar_value));
                 //iz1.push(this.getIz1(qtn[i], fr_percent[i]));
             }
+           // alert('here2')
                 if (coe_casing[i] != 0) {
                     //tf_adop_tension.push(this.getTfAdopTension(iz1[i], tf_clay[i], tf_sand[i], lc[i]));
                     //tf_adop_compression.push(this.getTfAdopCompression(iz1[i], tf_clay[i], tf_sand[i], lc[i]));
@@ -223,7 +224,6 @@ export default {
             //tension_capacity = (lookup_result/1500).toFixed(3) 
             tension_capacity = this.getTensionCapacityLookup(depth, tip, qs_tension);
             compression_capacity = this.getCompressionCapacityLookup(depth, tip, qs_compression, qb);
-
             //create dictionaries
             var param_dict_temp = [];
             var res_dict_temp = [];
@@ -275,6 +275,7 @@ export default {
                 })
 
             }
+        
         
         // todo: remove - for debugging
         localStorage.param_dict = JSON.stringify(param_dict_temp);
@@ -392,6 +393,8 @@ export default {
         }
         ntrial = this.getN(lc, sig_v0_prime_value)
         let err = Math.abs(ntrial - n)
+        let max = 100;
+        let current = 0;
         while (err > 0.001) {
             qtn = this.getQtn(qt_value, sig_v0_value, sig_v0_prime_value, ntrial)
             if (fr_percent_value == 0) {
@@ -402,6 +405,10 @@ export default {
             n =  Math.min(1, this.getN(lc, fr_percent_value))
             err = Math.abs(ntrial - n)
             ntrial = n
+            current = current + 1;
+            if (sig_v0_prime_value < 10 && current >= max) {
+                break; //exit while loop
+            }
         }
         return {
             qtn: qtn,

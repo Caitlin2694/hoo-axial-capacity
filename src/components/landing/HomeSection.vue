@@ -6,12 +6,11 @@
         <v-col cols="10">
           <v-row align="center" justify="center">
             <v-col cols="12" md="6" xl="8">
-              <h1 class="display-2 font-weight-bold mb-4">Driven piles axial capacity calculator</h1>
+              <h1 class="display-2 font-weight-bold mb-4">Axial Capacity Calculator using CPT</h1>
                 <v-img class="logo-img" width="70%" src="@/assets/img/uwalogo.png"></v-img>
               <h1 class="font-weight-light mt-5">
                 This program uses CPT data to calculate the  axial capacity of
-                driven piles using the 'Unified methods' included in the 2022
-                edition of ISO-19901-4.
+                piles. Please select a pile type to begin.
               </h1>
               <v-row>
                 <v-btn
