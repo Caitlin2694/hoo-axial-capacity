@@ -357,6 +357,8 @@ export default {
         }
         ntrial = this.getN(lc, sig_v0_prime_value)
         let err = Math.abs(ntrial - n)
+        let current = 0;
+        let max = 100;
         while (err > 0.001) {
             qtn = this.getQtn(qt_value, sig_v0_value, sig_v0_prime_value, ntrial)
             if (fr_percent_value == 0) {
@@ -367,6 +369,10 @@ export default {
             n =  Math.min(1, this.getN(lc, fr_percent_value))
             err = Math.abs(ntrial - n)
             ntrial = n
+            current = current + 1;
+            if (sig_v0_prime_value < 10 && current >= max) {
+                break; //exit while loop
+            }
         }
         return {
             qtn: qtn,

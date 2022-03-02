@@ -99,7 +99,7 @@
       </v-row>
 
       <v-row> 
-      <!--<download-csv
+      <download-csv
         class=""
         :data="debugParams()"
         name="param_debug_data.csv">
@@ -117,7 +117,7 @@
           color="primary">
           Debug Results
         </v-btn>
-      </download-csv>  -->
+      </download-csv>  
       </v-row>
             </div> 
     </v-card>
