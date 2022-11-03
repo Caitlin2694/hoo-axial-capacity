@@ -32,7 +32,7 @@
           <v-text-field
             label="Pile tip depths (m) for analysis (separated by commas) - note maximum depth is required to be less than depth of CPT."
             type="text"
-            :rules="[tipdepth_limit(userInput.tipdepth_analysis_values), tipdepth_vals_check(userInput.tipdepth_analysis_values),  tipdepth_commas(userInput.tipdepth_analysis_values), rules.required ]"
+            :rules="[tipdepth_limit(userInput.tipdepth_analysis_values), /*tipdepth_vals_check(userInput.tipdepth_analysis_values)*/,  tipdepth_commas(userInput.tipdepth_analysis_values), rules.required ]"
             v-model="userInput.tipdepth_analysis_values"
           ></v-text-field> 
           </v-form>

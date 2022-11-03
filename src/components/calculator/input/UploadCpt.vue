@@ -49,6 +49,12 @@
               dismissible
               type="error"
             >Your input CPT data contains incomplete values. Please check your data and try again. </v-alert>
+            <v-alert
+              v-if="negativeInput"
+              color="red"
+              dismissible
+              type="error"
+            >Your input CPT data contains negative values. Please check your data and try again. </v-alert>
           </tbody>
         </template>
       </v-simple-table>
@@ -100,6 +106,13 @@ export default {
                         temp_table_data = [];
                         break;
                       }   
+                      else if (this.cpt_data[i][0] < 0 || 
+                      this.cpt_data[i][1] < 0 ||
+                      this.cpt_data[i][2] < 0 || this.cpt_data[i][3] < 0) { // if any inputs are negative, tell user.
+                        this.negativeInput = true;
+                        temp_table_data = [];
+                        break;
+                      }   
                       
                       else { 
                         if (this.cpt_data[i][3] == "" || this.cpt_data[i][0] == null) {
@@ -129,6 +142,7 @@ export default {
             water_table: 0,
             max_depth: 0.15,
             erroredInput: false,
+            negativeInput: false,
         }
     },
     computed: {
@@ -147,6 +161,7 @@ export default {
       },
         selectFile() {
           this.erroredInput = false;
+          this.negativeInput = false;
          /* return first object in FileList */
             var file = event.target.files[0];
             var _this = this; // save it in a variable for usage inside function
@@ -170,6 +185,13 @@ export default {
                         _this.erroredInput = true;
                         temp_table_data = [];
                         break;
+                      }  
+                      else if (_this.cpt_data[i][0] < 0 || 
+                      _this.cpt_data[i][1] < 0 ||
+                      _this.cpt_data[i][2] < 0 || _this.cpt_data[i][3] < 0) { // if any inputs are negative, tell user.
+                        _this.negativeInput = true;
+                        temp_table_data = [];
+                        break;
                       }   
                       else { 
                         if (_this.cpt_data[i][3] == "" || _this.cpt_data[i][0] == null) {
@@ -187,6 +209,8 @@ export default {
                     _this.maxDepth();
          },
           convert_paste_to_cpt() {
+             this.erroredInput = false;
+            this.negativeInput = false;
             let rows = this.paste_excel();
             this.cpt_data = rows;
             this.complete_data_selection(this)

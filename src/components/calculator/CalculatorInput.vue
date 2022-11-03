@@ -250,6 +250,7 @@ export default {
           t = t.trim();
           return parseFloat(t);
         });
+        tipdepths = this.setNearestTipdepthAnalysisValues(tipdepths);
         tipdepths.sort(this.getTipdpthValue)
         for (let i=0; i<tipdepths.length; i++) {
           let res = null;
@@ -270,6 +271,24 @@ export default {
 
 
     },
+    setNearestTipdepthAnalysisValues(tipdepths) {
+      let depthList = this.cpt_data.map(data => parseFloat(data[0]))
+      return tipdepths.map(tipdepth => {
+        return this.closest(tipdepth, depthList);
+      });
+    },
+    closest(depth, tipdepth_list) {
+    return tipdepth_list.reduce((a, b) => {
+        let aDiff = Math.abs(a - depth);
+        let bDiff = Math.abs(b - depth);
+
+        if (aDiff == bDiff) {
+            return a > b ? a : b;
+        } else {
+            return bDiff < aDiff ? b : a;
+        }
+    });
+  },
   getTipdpthValue(item, nextitem) {
       return item.value - nextitem.value;
   },

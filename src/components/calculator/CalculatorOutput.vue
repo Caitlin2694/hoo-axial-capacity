@@ -65,7 +65,7 @@
 
       <div class="ma-5"> 
        <p>Thankyou for using our axial capacity calculator app! Click "back to input" to try different input data. Otherwise, click "go home" to go back to the home page. </p>
-              <p class="text-body-2 mt-3 ml-1">This freeware is provided "AS IS", and you, its user, assume all risks when using it. Licenced under a <a href="/licence" target="_blank" class="tou">MIT license</a></p>
+              <p class="text-body-2 mt-3 ml-1">This freeware is provided "AS IS", and you, its user, assume all risks when using it. Licenced under a <a href="/licence" target="_blank">MIT license</a></p>
                     <v-row>
        <v-col>
        <v-btn class="ma-2 mb-5"
@@ -99,7 +99,7 @@
       </v-row>
 
       <v-row> 
-      <download-csv
+      <!--<download-csv
         class=""
         :data="debugParams()"
         name="param_debug_data.csv">
@@ -117,7 +117,7 @@
           color="primary">
           Debug Results
         </v-btn>
-      </download-csv>  
+      </download-csv>  -->
       </v-row>
             </div> 
     </v-card>
