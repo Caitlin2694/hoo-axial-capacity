@@ -316,32 +316,6 @@ export default {
     getFrPercent(fs_value, qc_value, sig_v0_value) {
         return fs_value/(qc_value*1000-sig_v0_value)*100
     },
-    /*getIterativeValuesNew(qt_value, sig_v0_value, sig_v0_prime_value, fr_percent_value) {
-        let ntrial = 0
-        let n = 0
-        let qnet = 
-        let pa =
-        let sevo = 
-        //let Q = (qnet / pa) * (pa / sevo)
-        if (Rf = 0) {
-            Ic = 0 
-        } else {
-            Ic = ((3.47 - Application.WorksheetFunction.Log(Q)) ^ 2 + (1.22 + Application.WorksheetFunction.Log(Rf)) ^ 2) ^ 0.5
-        }
-        ntrial = 0.381 * Ic + 0.05 * (sevo / pa) - 0.15
-        err = Abs(ntrial - n)
-        while (err > 0.001) {
-            Qtn = (qnet / pa) * (pa / sevo) ^ ntrial
-            if (Rf = 0) {
-                Ic = 0 
-            } else {
-                Ic = ((3.47 - Application.WorksheetFunction.Log(Qtn)) ^ 2 + (1.22 + Application.WorksheetFunction.Log(Rf)) ^ 2) ^ 0.5
-            }
-        }
-        n = Math.min(1, 0.381 * Ic + 0.05 * (sevo / pa) - 0.15)
-        err = Math.abs(ntrial - n)
-        ntrial = n
-    },*/
     getDiameter(nominalSizeDoN, t_value) {
         return nominalSizeDoN-2*t_value/1000
     },
@@ -381,34 +355,6 @@ export default {
         }
 
     },
-    /*getIterativeValues(qt_value, sig_v0_value, sig_v0_prime_value, fr_percent_value) {
-        let flag = 0;
-        let n_estimate = 0.01;
-        let n_value = 0;
-        let lc_value = 0;
-        for (let j=1; j <= 10000; j++) {
-            if (flag == 0) {
-            let qtn_value = this.getQtn(qt_value, sig_v0_value, sig_v0_prime_value, n_estimate)
-            lc_value = this.getLc(qtn_value, fr_percent_value)
-            n_value = this.getN(lc_value, sig_v0_prime_value)
-            if (n_value > 1) {n_value == 1.00}
-                if (Math.abs(n_estimate - n_value) < 0.001) { 
-                    flag = 1;
-                    return {
-                        qtn: qtn_value,
-                        lc: lc_value,
-                        n: n_value
-                    }
-                } else {
-                n_estimate = n_estimate + 0.001
-                }
-            } else {
-                console.log('iterative values could not converge')
-                break; // todo: what to do if it never converges?
-            }
-            }
-            console.log('iterative values could not converge')
-        }, */
     getQtn(qt_value, sig_v0_value, sig_v0_prime_value, n_estimate) {
      return ((1000*qt_value-sig_v0_value)/100)*Math.pow((100/sig_v0_prime_value),n_estimate); //todo: check if qc or qt
     },
@@ -455,7 +401,7 @@ export default {
             deltaz = depthArray[i+1] - depthArray[i]
             let avgcells = 20*t / deltaz //% in macro casts to integer
             let qpc = 0;
-            if (depth > (8*diameter)) {
+            if (depth > (1.5*diameter)) {
                 let qtsum = 0;
                 let n = 0;
                 let j = i - Math.round(avgcells);
@@ -496,7 +442,7 @@ export default {
             deltaz = depthArray[i+1] - depthArray[i]
             let avgcells = Math.round(1.5*diameter / deltaz)//% in macro casts to integer
             let qpc = 0;
-            if (depth > (8*diameter)) {
+            if (depth > (1.5*diameter)) {
                 let qtsum = 0;
                 let n = 0;
                 let j = i - avgcells;
@@ -519,13 +465,10 @@ export default {
             }
             qpArray.push(qpc);
         }
-        //console.log('sand')
-        //console.log(qpArray);
         return qpArray;
     },
     getAr(pileEndCondition, nominalSizeDoN, ifr_value, diameter) {
         if (pileEndCondition != 1) { //closed
-        // return 1-0.980*(Math.pow(nominalSizeDoN-2*11.176/1000, 2))/(Math.pow(nominalSizeDoN, 2)); //TODO:figure out what 11.176 is and CALC 0.980
             return 1 - ifr_value*(Math.pow((diameter/nominalSizeDoN), 2))
         } else {
             return 1;
